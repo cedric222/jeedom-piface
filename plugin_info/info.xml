@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <info>
-    <id>piface</id>
-    <name>piface</name>
-    <description>Piface</description>
+    <id>piface2</id>
+    <name>piface2</name>
+    <description>Piface2</description>
     <icon>fa fa-keyboard-o</icon>
     <licence>AGPL</licence>
     <author>moi</author>

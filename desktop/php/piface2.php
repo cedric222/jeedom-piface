@@ -2,8 +2,8 @@
 if (!isConnect('admin')) {
     throw new Exception('{{401 - Accès non autorisé}}');
 }
-sendVarToJS('eqType', 'piface');
-$eqLogics = eqLogic::byType('piface');
+sendVarToJS('eqType', 'piface2');
+$eqLogics = eqLogic::byType('piface2');
 ?>
 
 <div class="row row-overflow">
@@ -34,7 +34,7 @@ $eqLogics = eqLogic::byType('piface');
                 foreach ($eqLogics as $eqLogic) {
                     echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >';
                     echo "<center>";
-                    echo '<img src="plugins/piface/doc/images/piface_icon.png" height="105" width="95" />';
+                    echo '<img src="plugins/piface2/doc/images/piface2_icon.png" height="105" width="95" />';
                     echo "</center>";
                     echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
                     echo '</div>';
@@ -88,7 +88,7 @@ $eqLogics = eqLogic::byType('piface');
         </form>
 
         <legend>{{Template}}</legend>
-        <table id="table_piface" class="table table-bordered table-condensed">
+        <table id="table_piface2" class="table table-bordered table-condensed">
             <thead>
                 <tr>
                     <th>{{Nom}}</th><th>{{Type}}</th><th>{{Action}}</th>
@@ -110,5 +110,5 @@ $eqLogics = eqLogic::byType('piface');
     </div>
 </div>
 
-<?php include_file('desktop', 'piface', 'js', 'piface'); ?>
-<?php include_file('core', 'plugin.piface', 'js'); ?>
+<?php include_file('desktop', 'piface2', 'js', 'piface2'); ?>
+<?php include_file('core', 'plugin.piface2', 'js'); ?>

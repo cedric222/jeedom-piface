@@ -18,7 +18,7 @@
 
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
-function piface_update() {
+function piface2_update() {
     
 }
 

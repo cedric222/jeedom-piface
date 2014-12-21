@@ -20,7 +20,7 @@
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 
-class piface extends eqLogic {
+class piface2 extends eqLogic {
     /*     * *************************Attributs****************************** */
 
 
@@ -29,19 +29,19 @@ class piface extends eqLogic {
 
      //Fonction lancé automatiquement toutes les minutes par jeedom
       public static function cron() {
-      $piface_path = realpath(dirname(__FILE__) . '/../../ressources/');
-      log::add('piface', 'error', 'serech  '."/usr/bin/python ".$piface_path."/chauf.py");
-      exec("pgrep --full --exact '/usr/bin/python ".$piface_path."/chauf.py'", $pids);
+      $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/');
+      log::add('piface2', 'error', 'serech  '."/usr/bin/python ".$piface2_path."/piface-deamon.py");
+      exec("pgrep --full --exact '/usr/bin/python ".$piface2_path."/piface-deamon.py'", $pids);
         if(empty($pids)) {
-         log::add('piface', 'error', 'PID chauf inexistant');
-         $cmd = "/usr/bin/python ".$piface_path."/chauf.py";
-         log::add('piface', 'error', 'start '.$cmd);
-         $result = exec($cmd .' >> ' . log::getPathToLog('piface') . ' 2>&1 &');
-          log::add('piface', 'error', 'after start'.$result);
+         log::add('piface2', 'error', 'PID chauf inexistant');
+         $cmd = "/usr/bin/python ".$piface2_path."/piface-deamon.py";
+         log::add('piface2', 'error', 'start '.$cmd);
+         $result = exec($cmd .' >> ' . log::getPathToLog('piface2') . ' 2>&1 &');
+          log::add('piface2', 'error', 'after start'.$result);
         }
         else
         {
-         log::add('piface', 'error', 'PID chauf is running');
+         log::add('piface2', 'error', 'PID chauf is running');
 
         }
 
@@ -108,7 +108,7 @@ class piface extends eqLogic {
     /*     * **********************Getteur Setteur*************************** */
 }
 
-class pifaceCmd extends cmd {
+class piface2Cmd extends cmd {
     /*     * *************************Attributs****************************** */
 
 
