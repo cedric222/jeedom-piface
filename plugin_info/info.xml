@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<info>
+    <id>piface</id>
+    <name>piface</name>
+    <description>Piface</description>
+    <icon>fa fa-keyboard-o</icon>
+    <licence>AGPL</licence>
+    <author>moi</author>
+    <installation>Aucune</installation>
+    <require>1.136</require>
+    <category>programming</category>
+</info>
+
