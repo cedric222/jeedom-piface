@@ -87,28 +87,41 @@ $eqLogics = eqLogic::byType('piface2');
             </fieldset> 
         </form>
 
-        <legend>{{Template}}</legend>
-        <table id="table_piface2" class="table table-bordered table-condensed">
-            <thead>
-                <tr>
-                    <th>{{Nom}}</th><th>{{Type}}</th><th>{{Action}}</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
 
-        <form class="form-horizontal">
-            <fieldset>
-                <div class="form-actions">
-                    <a class="btn btn-danger eqLogicAction" data-action="remove"><i class="fa fa-minus-circle"></i> {{Supprimer}}</a>
-                    <a class="btn btn-success eqLogicAction" data-action="save"><i class="fa fa-check-circle"></i> {{Sauvegarder}}</a>
-                </div>
-            </fieldset>
-        </form>
+    <legend>Commandes</legend>
+             <a class="btn btn-success btn-sm cmdAction expertModeVisible" data-action="add"><i class="fa fa-plus-circle"></i> {{Commandes}}</a><br/><br/>
+             <table id="table_cmd" class="table table-bordered table-condensed">
+                 <thead>
+                     <tr>
+                         <th style="width: 300px;">{{Nom}}</th>
+                         <th style="width: 130px;" class="expertModeVisible">{{Type}}</th>
+                         <th style="width: 100px;" class="expertModeVisible">{{ID}}</th>
+                         <th style="width: 200px;" class="expertModeVisible">{{Commande}}</th>
+                         <th >{{Paramètres}}</th>
+                         <th style="width: 100px;">{{Options}}</th>
+                         <th></th>
+                     </tr>
+                 </thead>
+                 <tbody>
+    
+                 </tbody>
+             </table>
+    
+             <form class="form-horizontal">
+                 <fieldset>
+                     <div class="form-actions">
+                         <a class="btn btn-danger eqLogicAction" data-action="remove"><i class="fa fa-minus-circle"></i> {{Supprimer}}</a>
+                         <a class="btn btn-success eqLogicAction" data-action="save"><i class="fa fa-check-circle"></i> {{Sauvegarder}}</a>
+                     </div>
+                 </fieldset>
+             </form>
+    
+         </div>
+     </div>
 
     </div>
 </div>
 
 <?php include_file('desktop', 'piface2', 'js', 'piface2'); ?>
 <?php include_file('core', 'plugin.piface2', 'js'); ?>
+

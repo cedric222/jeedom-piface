@@ -2,12 +2,14 @@
 <info>
     <id>piface2</id>
     <name>piface2</name>
-    <description>Piface2</description>
+    <description>Piface2 ITS A TEST DONT USE</description>
     <icon>fa fa-keyboard-o</icon>
     <licence>AGPL</licence>
     <author>moi</author>
     <installation>Aucune</installation>
     <require>1.136</require>
-    <category>programming</category>
+    <version>0.0.1</version>
+    <category>automation protocol</category>
+    <allowRemote>1</allowRemote>
 </info>
 
