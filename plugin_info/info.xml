@@ -2,14 +2,14 @@
 <info>
     <id>piface2</id>
     <name>piface2</name>
-    <description>Piface2 ITS A TEST DONT USE</description>
+    <description>Piface2</description>
     <icon>fa fa-keyboard-o</icon>
     <licence>AGPL</licence>
     <author>moi</author>
     <installation>Installed piface http://www.piface.org.uk/guides/Install_PiFace_Software/ 
     need to authorise www-data to spi and gpio in /etc/group (doc needed)</installation>
     <require>1.136</require>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <category>automation protocol</category>
     <allowRemote>1</allowRemote>
 </info>

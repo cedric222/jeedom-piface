@@ -35,15 +35,6 @@ if (!isConnect()) {
             </div>
         </div>
         <div class="form-group">
-                    <label class="col-lg-2 control-label">Piface IP</label>
-                    <div class="col-lg-2">
-                          <input class="configKey form-control" data-l1key="PifaceIP" />
-                    </div>
-            <div class="col-lg-3">
-                <div class="alert alert-info">127.0.0.1 if local</div>
-            </div>
-        </div>
-        <div class="form-group">
             <label class="col-lg-2 control-label">Piface Port</label>
             <div class="col-lg-2">
                 <input class="configKey form-control" data-l1key="PifacePort" />
