@@ -79,9 +79,15 @@ $eqLogics = eqLogic::byType('piface2');
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label">{{template param 1}}</label>
+                    <label class="col-sm-3 control-label">{{ip server web}}</label>
                     <div class="col-sm-3">
-                        <input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="city" placeholder="param1"/>
+                        <input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="ippiface" placeholder="127.0.0.1"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">{{port server web}}</label>
+                    <div class="col-sm-3">
+                        <input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="portpiface" placeholder="8080"/>
                     </div>
                 </div>
             </fieldset> 
@@ -123,5 +129,5 @@ $eqLogics = eqLogic::byType('piface2');
 </div>
 
 <?php include_file('desktop', 'piface2', 'js', 'piface2'); ?>
-<?php include_file('core', 'plugin.piface2', 'js'); ?>
+<?php include_file('core', 'plugin.template', 'js'); ?>
 

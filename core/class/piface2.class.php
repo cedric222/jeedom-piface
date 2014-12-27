@@ -21,9 +21,38 @@ require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 
 class piface2 extends eqLogic {
+  public static function callpiface2web2($ip,$port,$_url) {
+           log::add('piface2', 'Debug', 'url call ='.$ip.$port) ;
+           }
+   public static function callpiface2web($ip,$port,$_url) {
+           $url = 'http://' . $ip.':' .$port . $_url;
+           log::add('piface2', 'Debug', 'url call =  '.$url);
+           $ch = curl_init();
+           curl_setopt_array($ch, array(
+               CURLOPT_URL => $url,
+               CURLOPT_HEADER => false,
+               CURLOPT_RETURNTRANSFER => true
+           ));
+           $result = curl_exec($ch);
+           if (curl_errno($ch)) {
+               $curl_error = curl_error($ch);
+               curl_close($ch);
+               throw new Exception(__('Echec de la requete http : ', __FILE__) . $url . ' Curl error : ' . $curl_error, 404);
+           }
+           curl_close($ch);
+           if (strpos($result, 'Error 500: Server Error') === 0 || strpos($result, 'Error 500: Internal Server Error') === 0) {
+               if (strpos($result, 'Code took too long to return result') === false) {
+                   throw new Exception('Echec de la commande : ' . $_url . '. Erreur : ' . $result, 500);
+               }
+           }
+           if (is_json($result)) {
+               return json_decode($result, true);
+           } else {
+               return $result;
+           }
+       }
+
     /*     * *************************Attributs****************************** */
-
-
 
     /*     * ***********************Methode static*************************** */
 
@@ -129,10 +158,21 @@ class piface2Cmd extends cmd {
      */
 
     public function execute($_options = array()) {
-        
+    log::add('piface2', 'debug', 'Début fonction d\'envoi commandes piface2');
+    $eqLogic = $this->getEqLogic();
+    log::add('piface2', 'debug', 'instanceId = '.   $this->getConfiguration('instanceId') );
+    log::add('piface2', 'debug', 'value = '.   $this->getConfiguration('class') );
+    $ippiface = $eqLogic->getConfiguration('ippiface');
+    log::add('piface2', 'debug', 'mode = '. $this->getType());
+    log::add('piface2', 'debug', 'ippiface = '. $ippiface);
+    if ($this->getType() == 'action') {
+        $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/?digital_write='.$this->getConfiguration('instanceId').'&value='. $this->getConfiguration('class'));
+      }
+    else {
     }
 
     /*     * **********************Getteur Setteur*************************** */
+}
 }
 
 ?>

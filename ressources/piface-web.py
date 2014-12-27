@@ -17,13 +17,17 @@ class GetHandler(BaseHTTPRequestHandler):
         query_components = parse_qs(parsed_path.query)
         #pp = pprint.PrettyPrinter(indent=4)
         #pp.pprint(query_components)
-        if 'write' in query_components:
-              sortie = query_components['write'][0]
+        if 'digital_write' in query_components:
+              digital_write = query_components['digital_write'][0]
               value = query_components['value'][0]
-
-        message_parts = [
-                'sortie:(%s)'% sortie,
-                'value:(%s)'% value,
+              self.send_response(200)
+              self.send_header("Content-type", "application/json")
+              self.end_headers()
+              syslog.syslog("doing piface digital_write "+str(digital_write)+" "+str(value))
+              p.digital_write(int(digital_write),int(value))
+              self.wfile.write('{"ANSWER":"OK"}')
+        else:
+            message_parts = [
                 'CLIENT VALUES:',
                 'client_address=%s (%s)' % (self.client_address,
                                             self.address_string()),
@@ -40,17 +44,17 @@ class GetHandler(BaseHTTPRequestHandler):
                 '',
                 'HEADERS RECEIVED:',
                 ]
-        for name, value in sorted(self.headers.items()):
-            message_parts.append('%s=%s' % (name, value.rstrip()))
-        message_parts.append('')
-        message = '\r\n'.join(message_parts)
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(message)
+            for name, value in sorted(self.headers.items()):
+                message_parts.append('%s=%s' % (name, value.rstrip()))
+            message_parts.append('')
+            message = '\r\n'.join(message_parts)
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(message)
         return
 
 if __name__ == '__main__':
-
+    p.init()
     # get the port
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
