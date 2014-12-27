@@ -6,7 +6,8 @@
     <icon>fa fa-keyboard-o</icon>
     <licence>AGPL</licence>
     <author>moi</author>
-    <installation>Aucune</installation>
+    <installation>Installed piface http://www.piface.org.uk/guides/Install_PiFace_Software/ 
+    need to authorise www-data to spi and gpio in /etc/group (doc needed)</installation>
     <require>1.136</require>
     <version>0.0.1</version>
     <category>automation protocol</category>

@@ -29,22 +29,26 @@ class piface2 extends eqLogic {
 
      //Fonction lancé automatiquement toutes les minutes par jeedom
       public static function cron() {
-      $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/');
-      log::add('piface2', 'error', 'serech  '."/usr/bin/python ".$piface2_path."/piface-deamon.py");
-      exec("pgrep --full --exact '/usr/bin/python ".$piface2_path."/piface-deamon.py'", $pids);
+      $mode = config::byKey('Mode', 'piface2');
+      log::add('piface2', 'Debug', 'Mode =  '.$mode);
+      if ($mode != "Maitre")
+      {
+        $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
+        $port = config::byKey('PifacePort', 'piface2');
+        $cmd = "/usr/bin/python ".$piface2_path." ".$port;
+        log::add('piface2', 'info', 'verify if running  '.$piface2_path);
+        exec("pgrep --full --exact '$cmd'", $pids);
         if(empty($pids)) {
-         log::add('piface2', 'error', 'PID chauf inexistant');
-         $cmd = "/usr/bin/python ".$piface2_path."/piface-deamon.py";
-         log::add('piface2', 'error', 'start '.$cmd);
-         $result = exec($cmd .' >> ' . log::getPathToLog('piface2') . ' 2>&1 &');
-          log::add('piface2', 'error', 'after start'.$result);
+          log::add('piface2', 'error', 'PID did not exist, restart');
+          log::add('piface2', 'error', "start cmd = '".$cmd."'");
+          $result = exec($cmd .' >> ' . log::getPathToLog('piface2') . ' 2>&1 &');
+          log::add('piface2', 'debug', 'after start'.$result);
         }
         else
         {
-         log::add('piface2', 'error', 'PID chauf is running');
-
+          log::add('piface2', 'debug', "Piface '$piface2_path' is running");
         }
-
+      }
       }
 
 
