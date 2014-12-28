@@ -28,9 +28,9 @@ if (!isConnect()) {
             <label class="col-lg-2 control-label">Mode</label>
             <div class="col-lg-2">
                 <select class="configKey form-control" data-l1key="Mode">
-                    <option value="Standalone">Standalone</option>
-                    <option value="Maitre">Maitre</option>
-                    <option value="Esclave">Esclave</option>
+                    <option value="standalone">Standalone</option>
+                    <option value="maitre">Maitre</option>
+                    <option value="esclave">Esclave</option>
                 </select>
             </div>
         </div>

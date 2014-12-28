@@ -41,7 +41,15 @@ function addCmdToTable(_cmd) {
     tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
     tr += '</td>';
     tr += '<td class="expertModeVisible"><input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="instanceId" value="0"></td>';
-    tr += '<td class="expertModeVisible"><input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="class" ></td>';
+
+    tr += '<td class="expertModeVisible">';
+    tr += '<select class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="interface" >';
+    tr += '<option value="input">Input</option>';
+    tr += '<option value="output">Output</option>';
+    tr += '<option value="impulsion">Impulsion</option>';
+    tr += '</select>';
+    tr += '</td>';
+
     tr += '<td class="expertModeVisible">';
     tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="value" >';
     tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="returnStateValue" placeholder="{{Valeur retour d\'état}}" style="margin-top : 5px;">';

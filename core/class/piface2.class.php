@@ -56,8 +56,8 @@ class piface2 extends eqLogic {
      //Fonction lancé automatiquement toutes les minutes par jeedom
       public static function cron() {
       $mode = config::byKey('Mode', 'piface2');
-      log::add('piface2', 'Debug', 'Mode =  '.$mode);
-      if ($mode != "Maitre")
+      log::add('piface2', 'Debug', 'In cron in Mode =  '.$mode);
+      if ($mode != "maitre")
       {
         $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
         $port = config::byKey('PifacePort', 'piface2');
@@ -68,32 +68,35 @@ class piface2 extends eqLogic {
           log::add('piface2', 'error', 'PID did not exist, restart');
           log::add('piface2', 'error', "start cmd = '".$cmd."'");
           $result = exec($cmd .' >> ' . log::getPathToLog('piface2') . ' 2>&1 &');
-          log::add('piface2', 'debug', 'after start'.$result);
         }
         else
         {
-          log::add('piface2', 'debug', "Piface '$piface2_path' is running");
+          log::add('piface2', 'debug', "Piface web '$piface2_path' is running");
         }
       }
+      if ($mode != "esclave")
+            {
+            self::update_info();
+            }
+      }
+
+      public static function update_info()
+       {
       foreach (eqLogic::byType('piface2') as $eqLogic) {
            if ($eqLogic->getIsEnable() == 1) {
              $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status');
              foreach ($eqLogic->getCmd() as $cmd) {
-                #$cmd->execCmd
                 log::add('piface2', 'debug', 'in for instanceId = '.   $cmd->getConfiguration('instanceId') );
-                log::add('piface2', 'debug', 'in for value = '.   $cmd->getConfiguration('class') );
-                log::add('piface2', 'debug', 'getType()'.   $cmd->getType() );
-                $piface_type = strtoupper( $cmd->getConfiguration('class'));
+                log::add('piface2', 'debug', 'in for interface = '.   $cmd->getConfiguration('interface') );
+                log::add('piface2', 'debug', 'getType = '.   $cmd->getType() );
+                $piface_type = strtoupper( $cmd->getConfiguration('interface'));
                 if ( $cmd->getType() == 'info' and 
                     (  $piface_type == 'INPUT' or $piface_type == 'OUTPUT'))
                           {
-                           #$cmd->setValue($result[$piface_type][$cmd->getConfiguration('instanceId')]);
-                           $cmd->event(1);
-                           #$cmd->save();
-                           log::add('piface2', 'debug', 'set1 = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
+                           $cmd->event($result[$piface_type][$cmd->getConfiguration('instanceId')]);
+                           log::add('piface2', 'debug', 'set = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
                           }
                       }
-                #log::add('piface2', 'debug', 'getType()'.   $cmd->getType() );
             }
            }
       }
@@ -176,15 +179,20 @@ class piface2Cmd extends cmd {
      */
 
     public function execute($_options = array()) {
-    log::add('piface2', 'debug', 'Début fonction d\'envoi commandes piface2');
-    $eqLogic = $this->getEqLogic();
-    log::add('piface2', 'debug', 'instanceId = '.   $this->getConfiguration('instanceId') );
-    log::add('piface2', 'debug', 'value = '.   $this->getConfiguration('class') );
-    if ($this->getType() == 'action') {
-        $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/?output_set='.$this->getConfiguration('instanceId').'&value='. $this->getConfiguration('class'));
-      }
-    else {
-    }
+        log::add('piface2', 'debug', 'Début fonction d\'envoi commandes piface2');
+        $eqLogic = $this->getEqLogic();
+        log::add('piface2', 'debug', 'in execute with instanceId = '.   $this->getConfiguration('instanceId').  'and value = '.   $this->getConfiguration('value') );
+        if ($this->getType() == 'action') {
+              $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , 
+                                                $eqLogic->getConfiguration('portpiface'), 
+                                                '/?output_set='.$this->getConfiguration('instanceId').'&value='. $this->getConfiguration('value'));
+              //TODO mettre a jour les infos
+               piface2::update_info();
+        }
+        else {
+          log::add('piface2', 'debug', 'in execute with type '.   $this->getType() );
+          //TODO gerer quand c'est pas de type evenement
+        }
 
     /*     * **********************Getteur Setteur*************************** */
 }

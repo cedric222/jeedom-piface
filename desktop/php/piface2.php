@@ -10,7 +10,7 @@ $eqLogics = eqLogic::byType('piface2');
     <div class="col-lg-2 col-md-3 col-sm-4">
         <div class="bs-sidebar">
             <ul id="ul_eqLogic" class="nav nav-list bs-sidenav">
-                <a class="btn btn-default eqLogicAction" style="width : 100%;margin-top : 5px;margin-bottom: 5px;" data-action="add"><i class="fa fa-plus-circle"></i> {{Ajouter une template}}</a>
+                <a class="btn btn-default eqLogicAction" style="width : 100%;margin-top : 5px;margin-bottom: 5px;" data-action="add"><i class="fa fa-plus-circle"></i> {{Ajouter un Piface}}</a>
                 <li class="filter" style="margin-bottom: 5px;"><input class="filter form-control input-sm" placeholder="{{Rechercher}}" style="width: 100%"/></li>
                 <?php
                 foreach ($eqLogics as $eqLogic) {
@@ -22,7 +22,7 @@ $eqLogics = eqLogic::byType('piface2');
     </div>
 
     <div class="col-lg-10 col-md-9 col-sm-8 eqLogicThumbnailDisplay" style="border-left: solid 1px #EEE; padding-left: 25px;">
-        <legend>{{Mes templates}}
+        <legend>{{Mes Pifaces}}
         </legend>
         <?php
         if (count($eqLogics) == 0) {
@@ -81,13 +81,13 @@ $eqLogics = eqLogic::byType('piface2');
                 <div class="form-group">
                     <label class="col-sm-3 control-label">{{ip server web}}</label>
                     <div class="col-sm-3">
-                        <input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="ippiface" placeholder="127.0.0.1"/>
+                        <input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="ippiface" placeholder="IP du server piface"/>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-3 control-label">{{port server web}}</label>
                     <div class="col-sm-3">
-                        <input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="portpiface" placeholder="8080"/>
+                        <input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="portpiface" placeholder="port du server piface"/>
                     </div>
                 </div>
             </fieldset> 
@@ -102,7 +102,8 @@ $eqLogics = eqLogic::byType('piface2');
                          <th style="width: 300px;">{{Nom}}</th>
                          <th style="width: 130px;" class="expertModeVisible">{{Type}}</th>
                          <th style="width: 100px;" class="expertModeVisible">{{ID}}</th>
-                         <th style="width: 200px;" class="expertModeVisible">{{Commande}}</th>
+                         <th style="width: 200px;" class="expertModeVisible">{{Interface}}</th>
+                         <th style="width: 200px;" class="expertModeVisible">{{Valeur}}</th>
                          <th >{{Paramètres}}</th>
                          <th style="width: 100px;">{{Options}}</th>
                          <th></th>
