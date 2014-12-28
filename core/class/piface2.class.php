@@ -75,6 +75,27 @@ class piface2 extends eqLogic {
           log::add('piface2', 'debug', "Piface '$piface2_path' is running");
         }
       }
+      foreach (eqLogic::byType('piface2') as $eqLogic) {
+           if ($eqLogic->getIsEnable() == 1) {
+             $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status');
+             foreach ($eqLogic->getCmd() as $cmd) {
+                #$cmd->execCmd
+                log::add('piface2', 'debug', 'in for instanceId = '.   $cmd->getConfiguration('instanceId') );
+                log::add('piface2', 'debug', 'in for value = '.   $cmd->getConfiguration('class') );
+                log::add('piface2', 'debug', 'getType()'.   $cmd->getType() );
+                $piface_type = strtoupper( $cmd->getConfiguration('class'));
+                if ( $cmd->getType() == 'info' and 
+                    (  $piface_type == 'INPUT' or $piface_type == 'OUTPUT'))
+                          {
+                           #$cmd->setValue($result[$piface_type][$cmd->getConfiguration('instanceId')]);
+                           $cmd->event(1);
+                           #$cmd->save();
+                           log::add('piface2', 'debug', 'set1 = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
+                          }
+                      }
+                #log::add('piface2', 'debug', 'getType()'.   $cmd->getType() );
+            }
+           }
       }
 
 
@@ -160,7 +181,7 @@ class piface2Cmd extends cmd {
     log::add('piface2', 'debug', 'instanceId = '.   $this->getConfiguration('instanceId') );
     log::add('piface2', 'debug', 'value = '.   $this->getConfiguration('class') );
     if ($this->getType() == 'action') {
-        $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/?digital_write='.$this->getConfiguration('instanceId').'&value='. $this->getConfiguration('class'));
+        $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/?output_set='.$this->getConfiguration('instanceId').'&value='. $this->getConfiguration('class'));
       }
     else {
     }
