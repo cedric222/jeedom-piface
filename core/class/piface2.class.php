@@ -57,22 +57,8 @@ class piface2 extends eqLogic {
       public static function cron() {
       $mode = config::byKey('Mode', 'piface2');
       log::add('piface2', 'Debug', 'In cron in Mode =  '.$mode);
-      if ($mode != "maitre")
-      {
-        $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
-        $port = config::byKey('PifacePort', 'piface2');
-        $cmd = "/usr/bin/python ".$piface2_path." ".$port;
-        log::add('piface2', 'info', 'verify if running  '.$piface2_path);
-        exec("pgrep --full --exact '$cmd'", $pids);
-        if(empty($pids)) {
-          log::add('piface2', 'error', 'PID did not exist, restart');
-          log::add('piface2', 'error', "start cmd = '".$cmd."'");
-          $result = exec($cmd .' >> ' . log::getPathToLog('piface2') . ' 2>&1 &');
-        }
-        else
-        {
-          log::add('piface2', 'debug', "Piface web '$piface2_path' is running");
-        }
+      if (!self::deamonRunning()) {
+           self::runDeamon();
       }
       if ($mode != "esclave")
             {
@@ -91,7 +77,7 @@ class piface2 extends eqLogic {
                 log::add('piface2', 'debug', 'getType = '.   $cmd->getType() );
                 $piface_type = strtoupper( $cmd->getConfiguration('interface'));
                 if ( $cmd->getType() == 'info' and 
-                    (  $piface_type == 'INPUT' or $piface_type == 'OUTPUT'))
+                    (  $piface_type == 'INPUT' or $piface_type == 'OUTPUT' or $piface_type == 'EVENTS_COUNTER'))
                           {
                            $cmd->event($result[$piface_type][$cmd->getConfiguration('instanceId')]);
                            log::add('piface2', 'debug', 'set = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
@@ -100,7 +86,73 @@ class piface2 extends eqLogic {
             }
            }
       }
+    public static function runDeamon() {
+      log::add('piface2', 'debug', 'runDeamon');
+      if (config::byKey('Mode', 'piface2') != "maitre")
+        {
+         $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
+         $port = config::byKey('PifacePort', 'piface2');
+         $cmd = "/usr/bin/python ".$piface2_path." ".$port;
+        $result = exec($cmd . ' >> ' . log::getPathToLog('piface2') . ' 2>&1 &');
+        if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
+            log::add('piface2', 'error', $result);
+            return false;
+        }
+        sleep(5);
+        if (!self::deamonRunning()) {
+            sleep(20);
+            if (!self::deamonRunning()) {
+                log::add('piface2', 'error', 'Impossible de lancer le démon');
+                return false;
+            }
+        }
+        log::add('piface2', 'info', 'Démon Piface lancé');
+        }
+        }
 
+        
+    public static function deamonRunning() {
+        log::add('piface2', 'debug', 'begin deamonRunning');
+        $pid_file = '/tmp/piface-web.pid';
+        if (!file_exists($pid_file)) {
+            return false;
+        }
+        if (posix_getsid(trim(file_get_contents($pid_file)))) {
+            return true;
+        } else {
+            unlink($pid_file);
+            return false;
+        }
+    }
+    public static function stopDeamon() {
+        log::add('piface2', 'debug', 'begin stopDeamon');
+        if (!self::deamonRunning()) {
+            return true;
+        }
+        $pid_file = '/tmp/piface-web.pid';
+        if (!file_exists($pid_file)) {
+            return true;
+        }
+        $pid = intval(trim(file_get_contents($pid_file)));
+        $kill = posix_kill($pid, 15);
+        $retry = 0;
+        while (!$kill && $retry < 5) {
+            sleep(1);
+            $kill = posix_kill($pid, 9);
+            $retry++;
+        }
+        if (self::deamonRunning()) {
+            sleep(1);
+            exec('kill -9 ' . $pid . ' > /dev/null 2&1');
+            sleep(1);
+            exec('kill -9 ' . $pid . ' > /dev/null 2&1');
+        } else {
+            if (file_exists($pid_file)) {
+                unlink($pid_file);
+            }
+        }
+        return self::deamonRunning();
+    }
 
     /*
      * Fonction lancé automatiquement toutes les heures par jeedom
@@ -125,14 +177,18 @@ class piface2 extends eqLogic {
     }
 
     public function postInsert() {
-        
+    self::runDeamon();   
     }
 
     public function preSave() {
+    log::add('piface2', 'debug', 'in preSave');
         
     }
 
     public function postSave() {
+    log::add('piface2', 'debug', 'in postSave');
+    self::stopDeamon();
+    self::runDeamon();
         
     }
 
@@ -141,14 +197,21 @@ class piface2 extends eqLogic {
     }
 
     public function postUpdate() {
+    log::add('piface2', 'debug', 'in postUpdate');
+        self::stopDeamon();
+        self::runDeamon();
         
     }
 
     public function preRemove() {
+    log::add('piface2', 'debug', 'in preRemove');
+        self::stopDeamon();
         
     }
 
     public function postRemove() {
+    log::add('piface2', 'debug', 'in post Remove');
+        self::stopDeamon();
         
     }
 

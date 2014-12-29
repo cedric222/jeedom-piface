@@ -23,6 +23,15 @@ try {
     if (!isConnect('admin')) {
         throw new Exception(__('401 - Accès non autorisé', __FILE__));
     }
+    if (init('action') == 'stopRestartDeamon') {
+        piface2::stopDeamon();
+        if (piface2::deamonRunning()) {
+            throw new Exception(__('Impossible d\'arrêter le démon',__FILE__));
+        }
+        //log::clear('rfxcmd');
+        piface2::runDeamon();
+        ajax::success();
+    } 
 
 
 

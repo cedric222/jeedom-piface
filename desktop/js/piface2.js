@@ -46,7 +46,7 @@ function addCmdToTable(_cmd) {
     tr += '<select class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="interface" >';
     tr += '<option value="input">Input</option>';
     tr += '<option value="output">Output</option>';
-    tr += '<option value="impulsion">Impulsion</option>';
+    tr += '<option value="events_counter">Impulsions</option>';
     tr += '</select>';
     tr += '</td>';
 
