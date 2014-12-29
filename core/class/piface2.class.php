@@ -134,18 +134,27 @@ class piface2 extends eqLogic {
             return true;
         }
         $pid = intval(trim(file_get_contents($pid_file)));
-        $kill = posix_kill($pid, 15);
+        log::add('piface2', 'error', 'stopDeamon using kill -SIGINT '  . $pid);
+        exec('kill -SIGINT ' . $pid . ' > /dev/null 2&1');
         $retry = 0;
         while (!$kill && $retry < 5) {
-            sleep(1);
-            $kill = posix_kill($pid, 9);
+            sleep(2);
+            log::add('piface2', 'error', 'stopDeamon using kill -SIGINT '  . $pid);
+            exec('kill -SIGINT ' . $pid . ' > /dev/null 2&1');
             $retry++;
         }
         if (self::deamonRunning()) {
-            sleep(1);
-            exec('kill -9 ' . $pid . ' > /dev/null 2&1');
-            sleep(1);
-            exec('kill -9 ' . $pid . ' > /dev/null 2&1');
+            $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
+            $port = config::byKey('PifacePort', 'piface2');
+            $cmd = "/usr/bin/python ".$piface2_path." ".$port;
+            log::add('piface2', 'info', 'verify if running  '.$piface2_path);
+            exec("pgrep --full --exact '$cmd'", $pids);
+            foreach ($pids as $pid)
+              {
+              log::add('piface2', 'error', 'stopDeamon using kill -9 '  . $pid);
+              sleep(1);
+              exec('kill -9 ' . $pid . ' > /dev/null 2&1');
+              }
         } else {
             if (file_exists($pid_file)) {
                 unlink($pid_file);

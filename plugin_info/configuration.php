@@ -62,7 +62,7 @@ $deamonRunning = piface2::deamonRunning();
 </form>
 
 <script>
-    $('#"bt_stoppiface2Deamon').on('click', function () {
+    $('#bt_stoppiface2Deamon').on('click', function () {
         $.ajax({// fonction permettant de faire de l'ajax
             type: "POST", // methode de transmission des données au fichier php
             url: "plugins/piface2/core/ajax/piface2.ajax.php", // url du fichier php
