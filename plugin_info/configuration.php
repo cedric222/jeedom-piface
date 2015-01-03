@@ -27,7 +27,7 @@ $deamonRunning = piface2::deamonRunning();
     <fieldset>
          <?php
             if (!$deamonRunning) {
-                echo '<div class="alert alert-danger">Le démon piface2 ne tourne pas</div>';
+                echo '<div class="alert alert-danger">Le démon piface2 ne tourne pas (normal si mode maitre)</div>';
             } else {
                 echo '<div class="alert alert-success">Le démon piface2 est en marche</div>';
             }

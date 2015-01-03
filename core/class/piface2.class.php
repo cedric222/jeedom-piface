@@ -28,7 +28,8 @@ class piface2 extends eqLogic {
            curl_setopt_array($ch, array(
                CURLOPT_URL => $url,
                CURLOPT_HEADER => false,
-               CURLOPT_RETURNTRANSFER => true
+               CURLOPT_RETURNTRANSFER => true,
+               CURLOPT_TIMEOUT => 5
            ));
            $result = curl_exec($ch);
            if (curl_errno($ch)) {
@@ -66,15 +67,25 @@ class piface2 extends eqLogic {
             }
       }
 
+
       public static function update_info()
        {
       foreach (eqLogic::byType('piface2') as $eqLogic) {
            if ($eqLogic->getIsEnable() == 1) {
              $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status');
-             foreach ($eqLogic->getCmd() as $cmd) {
-                log::add('piface2', 'debug', 'in for instanceId = '.   $cmd->getConfiguration('instanceId') );
-                log::add('piface2', 'debug', 'in for interface = '.   $cmd->getConfiguration('interface') );
-                log::add('piface2', 'debug', 'getType = '.   $cmd->getType() );
+              if ($result["VERSION"] == "1.0")
+              {
+                log::add('piface2', 'debug', 'good client version '.$result["VERSION"]);
+              }
+           else
+              {
+              log::add('piface2', 'error', 'BAD VERSION of the client '.$result["VERSION"]);
+              self::soft_kill($eqLogic);
+              self::runDeamon();
+              return;
+              }
+       foreach ($eqLogic->getCmd() as $cmd) {
+                log::add('piface2', 'debug', 'in for instanceId = '.   $cmd->getConfiguration('instanceId').' type = '.$cmd->getConfiguration('interface') );
                 $piface_type = strtoupper( $cmd->getConfiguration('interface'));
                 if ( $cmd->getType() == 'info' and 
                     (  $piface_type == 'INPUT' or $piface_type == 'OUTPUT' or $piface_type == 'EVENTS_COUNTER'))
@@ -86,6 +97,17 @@ class piface2 extends eqLogic {
             }
            }
       }
+    public static function soft_kill($eqLogic)
+    {
+    log::add('piface2', 'error', 'soft reset of the client');
+    $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/exit');
+    if ($result["EXIT"] == "OK")
+      { return true ;}
+    else
+      {
+      return false;
+      }
+    }
     public static function runDeamon() {
       log::add('piface2', 'debug', 'runDeamon');
       if (config::byKey('Mode', 'piface2') != "maitre")
@@ -129,20 +151,8 @@ class piface2 extends eqLogic {
         if (!self::deamonRunning()) {
             return true;
         }
-        $pid_file = '/tmp/piface-web.pid';
-        if (!file_exists($pid_file)) {
-            return true;
-        }
-        $pid = intval(trim(file_get_contents($pid_file)));
-        log::add('piface2', 'error', 'stopDeamon using kill -SIGINT '  . $pid);
-        exec('kill -SIGINT ' . $pid . ' > /dev/null 2&1');
-        $retry = 0;
-        while (!$kill && $retry < 5) {
-            sleep(2);
-            log::add('piface2', 'error', 'stopDeamon using kill -SIGINT '  . $pid);
-            exec('kill -SIGINT ' . $pid . ' > /dev/null 2&1');
-            $retry++;
-        }
+        #self::soft_kill();
+        #sleep(5);
         if (self::deamonRunning()) {
             $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
             $port = config::byKey('PifacePort', 'piface2');
@@ -151,7 +161,7 @@ class piface2 extends eqLogic {
             exec("pgrep --full --exact '$cmd'", $pids);
             foreach ($pids as $pid)
               {
-              log::add('piface2', 'error', 'stopDeamon using kill -9 '  . $pid);
+              log::add('piface2', 'info', 'stopDeamon using kill -9 '  . $pid);
               sleep(1);
               exec('kill -9 ' . $pid . ' > /dev/null 2&1');
               }
@@ -186,7 +196,6 @@ class piface2 extends eqLogic {
     }
 
     public function postInsert() {
-    self::runDeamon();   
     }
 
     public function preSave() {
@@ -196,31 +205,25 @@ class piface2 extends eqLogic {
 
     public function postSave() {
     log::add('piface2', 'debug', 'in postSave');
-    self::stopDeamon();
-    self::runDeamon();
-        
     }
 
     public function preUpdate() {
-        
+    log::add('piface2', 'debug', 'in preUpdate');
     }
 
     public function postUpdate() {
     log::add('piface2', 'debug', 'in postUpdate');
-        self::stopDeamon();
-        self::runDeamon();
-        
     }
 
     public function preRemove() {
     log::add('piface2', 'debug', 'in preRemove');
-        self::stopDeamon();
+    self::stopDeamon();
         
     }
 
     public function postRemove() {
     log::add('piface2', 'debug', 'in post Remove');
-        self::stopDeamon();
+    self::stopDeamon();
         
     }
 

@@ -1,3 +1,9 @@
+#! /usr/bin/python
+
+version = "1.0"
+exit = 1
+
+
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import urlparse
 from urlparse import parse_qs
@@ -37,8 +43,6 @@ class GetHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed_path = urlparse.urlparse(self.path)
         query_components = parse_qs(parsed_path.query)
-        #pp = pprint.PrettyPrinter(indent=4)
-        #pp.pprint(query_components)
         if 'output_set' in query_components:
               digital_write = query_components['output_set'][0]
               value = query_components['value'][0]
@@ -59,10 +63,29 @@ class GetHandler(BaseHTTPRequestHandler):
               self.end_headers()
               prepare_json = {}
               prepare_json["STATUS"] = "OK"
+              prepare_json["VERSION"] = version
               prepare_json["INPUT"] = prepare_json_hash_in ;
               prepare_json["OUTPUT"] = prepare_json_hash_out ;
               prepare_json["EVENTS_COUNTER"] = event_counter ;
               json_sting = json.dumps(prepare_json)
+              self.wfile.write(json_sting)
+        elif 'version' in  parsed_path.path:
+              prepare_json = {}
+              prepare_json["VERSION"] = version
+              json_sting = json.dumps(prepare_json)
+              self.send_response(200)
+              self.send_header("Content-type", "application/json")
+              self.end_headers()
+              self.wfile.write(json_sting)
+        elif 'exit' in  parsed_path.path:
+              global exit
+              exit = 0
+              prepare_json = {}
+              prepare_json["EXIT"] = "GO"
+              json_sting = json.dumps(prepare_json)
+              self.send_response(200)
+              self.send_header("Content-type", "application/json")
+              self.end_headers()
               self.wfile.write(json_sting)
         else:
             message_parts = [
@@ -91,6 +114,23 @@ class GetHandler(BaseHTTPRequestHandler):
             self.wfile.write(message)
         return
 
+def run_while_true():
+    """
+    This assumes that keep_running() is a function of no arguments which
+    is tested initially and after each request.  If its return value
+    is true, the server continues.
+    """
+    if len(sys.argv) > 1:
+        port = int(sys.argv[1])
+    else:
+        port = DEFAULT_PORT
+    server = HTTPServer(('', port), GetHandler)
+    while exit:
+        server.handle_request()
+    server.socket.close()
+    
+
+
 if __name__ == '__main__':
     pid = str(os.getpid())
     pidfile = "/tmp/piface-web.pid"
@@ -113,18 +153,12 @@ if __name__ == '__main__':
     listener.register(6, pifacedigitalio.IODIR_FALLING_EDGE, event6)
     listener.register(7, pifacedigitalio.IODIR_FALLING_EDGE, event7)
     listener.activate()
-    # get the port
-    if len(sys.argv) > 1:
-        port = int(sys.argv[1])
-    else:
-        port = DEFAULT_PORT
-    server = HTTPServer(('', port), GetHandler)
-    print 'Starting server, use <Ctrl-C> to stop'
-    try:
-        server.serve_forever()
+    try:  
+        run_while_true()
     except:
-         server.socket.close()
-         listener.deactivate()
-         os.unlink(pidfile)
-         print "Bye."
+        print "end in except"
+    #Kill
+    listener.deactivate()
+    os.unlink(pidfile)
+    print "Bye."
 
