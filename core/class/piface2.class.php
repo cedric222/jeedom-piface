@@ -21,256 +21,256 @@ require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 
 class piface2 extends eqLogic {
-   public static function callpiface2web($ip,$port,$_url) {
-           $url = 'http://' . $ip.':' .$port . $_url;
-           log::add('piface2', 'Debug', 'url call =  '.$url);
-           $ch = curl_init();
-           curl_setopt_array($ch, array(
-               CURLOPT_URL => $url,
-               CURLOPT_HEADER => false,
-               CURLOPT_RETURNTRANSFER => true,
-               CURLOPT_TIMEOUT => 5
-           ));
-           $result = curl_exec($ch);
-           if (curl_errno($ch)) {
-               $curl_error = curl_error($ch);
-               curl_close($ch);
-               throw new Exception(__('Echec de la requete http : ', __FILE__) . $url . ' Curl error : ' . $curl_error, 404);
-           }
-           curl_close($ch);
-           if (strpos($result, 'Error 500: Server Error') === 0 || strpos($result, 'Error 500: Internal Server Error') === 0) {
-               if (strpos($result, 'Code took too long to return result') === false) {
-                   throw new Exception('Echec de la commande : ' . $_url . '. Erreur : ' . $result, 500);
-               }
-           }
-           if (is_json($result)) {
-               return json_decode($result, true);
-           } else {
-               return $result;
-           }
-       }
-
-    /*     * *************************Attributs****************************** */
-
-    /*     * ***********************Methode static*************************** */
-
-     //Fonction lancé automatiquement toutes les minutes par jeedom
-      public static function cron() {
-      $mode = config::byKey('Mode', 'piface2');
-      log::add('piface2', 'Debug', 'In cron in Mode =  '.$mode);
-      if (!self::deamonRunning()) {
-           self::runDeamon();
+  public static function callpiface2web($ip,$port,$_url) {
+    $url = 'http://' . $ip.':' .$port . $_url;
+    log::add('piface2', 'Debug', 'url call =  '.$url);
+    $ch = curl_init();
+    curl_setopt_array($ch, array(
+          CURLOPT_URL => $url,
+          CURLOPT_HEADER => false,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_TIMEOUT => 5
+          ));
+    $result = curl_exec($ch);
+    if (curl_errno($ch)) {
+      $curl_error = curl_error($ch);
+      curl_close($ch);
+      throw new Exception(__('Echec de la requete http : ', __FILE__) . $url . ' Curl error : ' . $curl_error, 404);
+    }
+    curl_close($ch);
+    if (strpos($result, 'Error 500: Server Error') === 0 || strpos($result, 'Error 500: Internal Server Error') === 0) {
+      if (strpos($result, 'Code took too long to return result') === false) {
+        throw new Exception('Echec de la commande : ' . $_url . '. Erreur : ' . $result, 500);
       }
-      if ($mode != "esclave")
-            {
-            self::update_info();
-            }
-      }
+    }
+    if (is_json($result)) {
+      return json_decode($result, true);
+    } else {
+      return $result;
+    }
+  }
 
+  /*     * *************************Attributs****************************** */
 
-      public static function update_info()
-       {
-      foreach (eqLogic::byType('piface2') as $eqLogic) {
-           if ($eqLogic->getIsEnable() == 1) {
-             $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status');
-              if ($result["VERSION"] == "1.0")
-              {
-                log::add('piface2', 'debug', 'good client version '.$result["VERSION"]);
-              }
-           else
-              {
-              log::add('piface2', 'error', 'BAD VERSION of the client '.$result["VERSION"]);
-              self::soft_kill($eqLogic);
-              self::runDeamon();
-              return;
-              }
-       foreach ($eqLogic->getCmd() as $cmd) {
-                log::add('piface2', 'debug', 'in for instanceId = '.   $cmd->getConfiguration('instanceId').' type = '.$cmd->getConfiguration('interface') );
-                $piface_type = strtoupper( $cmd->getConfiguration('interface'));
-                if ( $cmd->getType() == 'info' and 
-                    (  $piface_type == 'INPUT' or $piface_type == 'OUTPUT' or $piface_type == 'EVENTS_COUNTER'))
-                          {
-                           $cmd->event($result[$piface_type][$cmd->getConfiguration('instanceId')]);
-                           log::add('piface2', 'debug', 'set = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
-                          }
-                      }
-            }
-           }
-      }
-    public static function soft_kill($eqLogic)
+  /*     * ***********************Methode static*************************** */
+
+  //Fonction lancé automatiquement toutes les minutes par jeedom
+  public static function cron() {
+    $mode = config::byKey('Mode', 'piface2');
+    log::add('piface2', 'Debug', 'In cron in Mode =  '.$mode);
+    if (!self::deamonRunning()) {
+      self::runDeamon();
+    }
+    if ($mode != "esclave")
     {
+      self::update_info();
+    }
+  }
+
+
+  public static function update_info()
+  {
+    foreach (eqLogic::byType('piface2') as $eqLogic) {
+      if ($eqLogic->getIsEnable() == 1) {
+        $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status');
+        if ($result["VERSION"] == "1.0")
+        {
+          log::add('piface2', 'debug', 'good client version '.$result["VERSION"]);
+        }
+        else
+        {
+          log::add('piface2', 'error', 'BAD VERSION of the client '.$result["VERSION"]);
+          self::soft_kill($eqLogic);
+          self::runDeamon();
+          return;
+        }
+        foreach ($eqLogic->getCmd() as $cmd) {
+          log::add('piface2', 'debug', 'in for instanceId = '.   $cmd->getConfiguration('instanceId').' type = '.$cmd->getConfiguration('interface') );
+          $piface_type = strtoupper( $cmd->getConfiguration('interface'));
+          if ( $cmd->getType() == 'info' and 
+              (  $piface_type == 'INPUT' or $piface_type == 'OUTPUT' or $piface_type == 'EVENTS_COUNTER'))
+          {
+            $cmd->event($result[$piface_type][$cmd->getConfiguration('instanceId')]);
+            log::add('piface2', 'debug', 'set = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
+          }
+        }
+      }
+    }
+  }
+  public static function soft_kill($eqLogic)
+  {
     log::add('piface2', 'error', 'soft reset of the client');
     $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/exit');
     if ($result["EXIT"] == "OK")
-      { return true ;}
+    { return true ;}
     else
-      {
+    {
       return false;
-      }
     }
-    public static function runDeamon() {
-      log::add('piface2', 'debug', 'runDeamon');
-      if (config::byKey('Mode', 'piface2') != "maitre")
-        {
-         $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
-         $port = config::byKey('PifacePort', 'piface2');
-         $cmd = "/usr/bin/python ".$piface2_path." ".$port;
-        $result = exec($cmd . ' >> ' . log::getPathToLog('piface2') . ' 2>&1 &');
-        if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
-            log::add('piface2', 'error', $result);
-            return false;
-        }
-        sleep(5);
+  }
+  public static function runDeamon() {
+    log::add('piface2', 'debug', 'runDeamon');
+    if (config::byKey('Mode', 'piface2') != "maitre")
+    {
+      $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
+      $port = config::byKey('PifacePort', 'piface2');
+      $cmd = "/usr/bin/python ".$piface2_path." ".$port;
+      $result = exec($cmd . ' >> ' . log::getPathToLog('piface2') . ' 2>&1 &');
+      if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
+        log::add('piface2', 'error', $result);
+        return false;
+      }
+      sleep(5);
+      if (!self::deamonRunning()) {
+        sleep(20);
         if (!self::deamonRunning()) {
-            sleep(20);
-            if (!self::deamonRunning()) {
-                log::add('piface2', 'error', 'Impossible de lancer le démon');
-                return false;
-            }
+          log::add('piface2', 'error', 'Impossible de lancer le démon');
+          return false;
         }
-        log::add('piface2', 'info', 'Démon Piface lancé');
-        }
-        }
-
-        
-    public static function deamonRunning() {
-        log::add('piface2', 'debug', 'begin deamonRunning');
-        $pid_file = '/tmp/piface-web.pid';
-        if (!file_exists($pid_file)) {
-            return false;
-        }
-        if (posix_getsid(trim(file_get_contents($pid_file)))) {
-            return true;
-        } else {
-            unlink($pid_file);
-            return false;
-        }
-    }
-    public static function stopDeamon() {
-        log::add('piface2', 'debug', 'begin stopDeamon');
-        if (!self::deamonRunning()) {
-            return true;
-        }
-        #self::soft_kill();
-        #sleep(5);
-        if (self::deamonRunning()) {
-            $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
-            $port = config::byKey('PifacePort', 'piface2');
-            $cmd = "/usr/bin/python ".$piface2_path." ".$port;
-            log::add('piface2', 'info', 'verify if running  '.$piface2_path);
-            exec("pgrep --full --exact '$cmd'", $pids);
-            foreach ($pids as $pid)
-              {
-              log::add('piface2', 'info', 'stopDeamon using kill -9 '  . $pid);
-              sleep(1);
-              exec('kill -9 ' . $pid . ' > /dev/null 2&1');
-              }
-        } else {
-            if (file_exists($pid_file)) {
-                unlink($pid_file);
-            }
-        }
-        return self::deamonRunning();
-    }
-
-    /*
-     * Fonction lancé automatiquement toutes les heures par jeedom
-      public static function cronHourly() {
-
       }
-     */
+      log::add('piface2', 'info', 'Démon Piface lancé');
+    }
+  }
 
-    /*
-     * Fonction lancé automatiquement touts les jours par jeedom
-      public static function cronDayly() {
 
+  public static function deamonRunning() {
+    log::add('piface2', 'debug', 'begin deamonRunning');
+    $pid_file = '/tmp/piface-web.pid';
+    if (!file_exists($pid_file)) {
+      return false;
+    }
+    if (posix_getsid(trim(file_get_contents($pid_file)))) {
+      return true;
+    } else {
+      unlink($pid_file);
+      return false;
+    }
+  }
+  public static function stopDeamon() {
+    log::add('piface2', 'debug', 'begin stopDeamon');
+    if (!self::deamonRunning()) {
+      return true;
+    }
+#self::soft_kill();
+#sleep(5);
+    if (self::deamonRunning()) {
+      $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
+      $port = config::byKey('PifacePort', 'piface2');
+      $cmd = "/usr/bin/python ".$piface2_path." ".$port;
+      log::add('piface2', 'info', 'verify if running  '.$piface2_path);
+      exec("pgrep --full --exact '$cmd'", $pids);
+      foreach ($pids as $pid)
+      {
+        log::add('piface2', 'info', 'stopDeamon using kill -9 '  . $pid);
+        sleep(1);
+        exec('kill -9 ' . $pid . ' > /dev/null 2&1');
       }
-     */
-
-
-
-    /*     * *********************Methode d'instance************************* */
-
-    public function preInsert() {
-        
+    } else {
+      if (file_exists($pid_file)) {
+        unlink($pid_file);
+      }
     }
+    return self::deamonRunning();
+  }
 
-    public function postInsert() {
-    }
+  /*
+   * Fonction lancé automatiquement toutes les heures par jeedom
+   public static function cronHourly() {
 
-    public function preSave() {
+   }
+   */
+
+  /*
+   * Fonction lancé automatiquement touts les jours par jeedom
+   public static function cronDayly() {
+
+   }
+   */
+
+
+
+  /*     * *********************Methode d'instance************************* */
+
+  public function preInsert() {
+
+  }
+
+  public function postInsert() {
+  }
+
+  public function preSave() {
     log::add('piface2', 'debug', 'in preSave');
-        
-    }
 
-    public function postSave() {
+  }
+
+  public function postSave() {
     log::add('piface2', 'debug', 'in postSave');
-    }
+  }
 
-    public function preUpdate() {
+  public function preUpdate() {
     log::add('piface2', 'debug', 'in preUpdate');
-    }
+  }
 
-    public function postUpdate() {
+  public function postUpdate() {
     log::add('piface2', 'debug', 'in postUpdate');
-    }
+  }
 
-    public function preRemove() {
+  public function preRemove() {
     log::add('piface2', 'debug', 'in preRemove');
     self::stopDeamon();
-        
-    }
 
-    public function postRemove() {
+  }
+
+  public function postRemove() {
     log::add('piface2', 'debug', 'in post Remove');
     self::stopDeamon();
-        
-    }
 
-    /*
-     * Non obligatoire mais permet de modifier l'affichage du widget si vous en avez besoin
-      public function toHtml($_version = 'dashboard') {
+  }
 
-      }
-     */
+  /*
+   * Non obligatoire mais permet de modifier l'affichage du widget si vous en avez besoin
+   public function toHtml($_version = 'dashboard') {
 
-    /*     * **********************Getteur Setteur*************************** */
+   }
+   */
+
+  /*     * **********************Getteur Setteur*************************** */
 }
 
 class piface2Cmd extends cmd {
-    /*     * *************************Attributs****************************** */
+  /*     * *************************Attributs****************************** */
 
 
-    /*     * ***********************Methode static*************************** */
+  /*     * ***********************Methode static*************************** */
 
 
-    /*     * *********************Methode d'instance************************* */
+  /*     * *********************Methode d'instance************************* */
 
-    /*
-     * Non obligatoire permet de demander de ne pas supprimer les commandes meme si elle ne sont pas dans la nouvelle configuration de l'équipement envoyé en JS
-      public function dontRemoveCmd() {
-      return true;
-      }
-     */
+  /*
+   * Non obligatoire permet de demander de ne pas supprimer les commandes meme si elle ne sont pas dans la nouvelle configuration de l'équipement envoyé en JS
+   public function dontRemoveCmd() {
+   return true;
+   }
+   */
 
-    public function execute($_options = array()) {
-        log::add('piface2', 'debug', 'Début fonction d\'envoi commandes piface2');
-        $eqLogic = $this->getEqLogic();
-        log::add('piface2', 'debug', 'in execute with instanceId = '.   $this->getConfiguration('instanceId').  'and value = '.   $this->getConfiguration('value') );
-        if ($this->getType() == 'action') {
-              $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , 
-                                                $eqLogic->getConfiguration('portpiface'), 
-                                                '/?output_set='.$this->getConfiguration('instanceId').'&value='. $this->getConfiguration('value'));
-              //TODO mettre a jour les infos
-               piface2::update_info();
-        }
-        else {
-          log::add('piface2', 'debug', 'in execute with type '.   $this->getType() );
-          //TODO gerer quand c'est pas de type evenement
-        }
+  public function execute($_options = array()) {
+    log::add('piface2', 'debug', 'Début fonction d\'envoi commandes piface2');
+    $eqLogic = $this->getEqLogic();
+    log::add('piface2', 'debug', 'in execute with instanceId = '.   $this->getConfiguration('instanceId').  'and value = '.   $this->getConfiguration('value') );
+    if ($this->getType() == 'action') {
+      $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , 
+          $eqLogic->getConfiguration('portpiface'), 
+          '/?output_set='.$this->getConfiguration('instanceId').'&value='. $this->getConfiguration('value'));
+      //TODO mettre a jour les infos
+      piface2::update_info();
+    }
+    else {
+      log::add('piface2', 'debug', 'in execute with type '.   $this->getType() );
+      //TODO gerer quand c'est pas de type evenement
+    }
 
     /*     * **********************Getteur Setteur*************************** */
-}
+  }
 }
 
 ?>
