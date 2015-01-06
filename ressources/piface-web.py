@@ -1,11 +1,12 @@
 #! /usr/bin/python
 
-version = "1.0"
+version = "1.1"
 exit = 1
 
-jeedom_master_ip = '192.168.0.15'
-jeedom_master_key = 'ii30r4s2jak2hv94t06s'
-jeedom_need_update = 0
+jeedom_master_ip = ''
+jeedom_master_key = ''
+time_between_update = 10
+last_update = 0
 
 
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
@@ -24,53 +25,70 @@ import httplib
 
 DEFAULT_PORT = 8000
 
-def need_update(num):
-  conn = httplib.HTTPConnection(jeedom_master_ip)
-  conn.request("GET", "/jeedom/core/api/jeeApi.php?apikey="+str(jeedom_master_key)+"&type=piface2&messagetype=update")
-  r1 = conn.getresponse()
-  print r1.status, r1.reason
-  conn.close()
+def need_update(num,timestamp):
+  global last_update
+  if (timestamp - last_update >= time_between_update and jeedom_master_ip != ''):
+    last_update = timestamp
+    conn = httplib.HTTPConnection(jeedom_master_ip)
+    conn.request("GET", "/jeedom/core/api/jeeApi.php?apikey="+str(jeedom_master_key)+"&type=piface2&messagetype=update")
+    r1 = conn.getresponse()
+    #print r1.status, r1.reason
+    conn.close()
+  else:
+    print "too early "
 
   
   
 
 def event0(event):
-  event_counter[0] = event_counter[0] + 1
-  need_update(0)
+  if event.direction == 0:
+      event_counter[0] += 1
+  need_update(0,event.timestamp)
   print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event1(event):
-  event_counter[1] = event_counter[1] + 1
-  need_update(1)
+  if event.direction == 0:
+      event_counter[1] += 1 
+  need_update(1,event.timestamp)
   print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event2(event):
-  event_counter[2] = event_counter[2] + 1
-  need_update(2)
+  if event.direction == 0:
+      event_counter[2] += 1
+  need_update(2,event.timestamp)
   print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event3(event):
-  event_counter[3] = event_counter[3] + 1
-  need_update(3)
+  if event.direction == 0:
+      event_counter[3] += 1
+  need_update(3,event.timestamp)
   print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event4(event):
-  event_counter[4] = event_counter[4] + 1
-  need_update(4)
+  if event.direction == 0:
+      event_counter[4] += 1
+  need_update(4,event.timestamp)
   print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event5(event):
-  event_counter[5] = event_counter[5] + 1
-  need_update(5)
+  if event.direction == 0:
+      event_counter[5] += 1
+  need_update(5,event.timestamp)
   print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event6(event):
-  event_counter[6] = event_counter[6] + 1
-  need_update(6)
+  if event.direction == 0:
+      event_counter[6] += 1
+  need_update(6,event.timestamp)
   print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event7(event):
-  event_counter[7] = event_counter[7] + 1
-  need_update(7)
+  if event.direction == 0:
+      event_counter[7] += 1
+  need_update(7,event.timestamp)
   print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 
 
 class GetHandler(BaseHTTPRequestHandler):
     
     def do_GET(self):
+        global jeedom_master_ip
+        global jeedom_master_key 
+
+        
         parsed_path = urlparse.urlparse(self.path)
         query_components = parse_qs(parsed_path.query)
         if 'output_set' in query_components:
@@ -83,6 +101,10 @@ class GetHandler(BaseHTTPRequestHandler):
               p.output_pins[int(digital_write)].value = int(value)
               self.wfile.write('{"STATUS":"OK"}')
         elif 'status' in parsed_path.path:
+              if 'apikey' in  query_components:
+                  jeedom_master_key =  query_components['apikey'][0]
+              if 'jeedom_master_ip' in  query_components:
+                  jeedom_master_ip =  query_components['jeedom_master_ip'][0]
               prepare_json_hash_in = {}
               prepare_json_hash_out = {}
               for i in range(0,8):

@@ -71,15 +71,16 @@ class piface2 extends eqLogic {
   public static function update_info()
   {
     foreach (eqLogic::byType('piface2') as $eqLogic) {
+      log::add('piface2', 'info', 'IP externe :' . config::byKey('internalAddr'));
       if ($eqLogic->getIsEnable() == 1) {
-        $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status');
-        if ($result["VERSION"] == "1.0")
+        $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status?apikey='.config::byKey('jeeNetwork::master::apikey').'&jeedom_master_ip='.config::byKey('internalAddr'));
+        if ($result["VERSION"] == "1.1")
         {
-          log::add('piface2', 'debug', 'good client version '.$result["VERSION"]);
+          log::add('piface2', 'debug', 'good deamon version '.$result["VERSION"]);
         }
         else
         {
-          log::add('piface2', 'error', 'BAD VERSION of the client '.$result["VERSION"]);
+          log::add('piface2', 'error', 'BAD DEAMON VERSION : '.$result["VERSION"]);
           self::soft_kill($eqLogic);
           self::runDeamon();
           return;
@@ -158,7 +159,7 @@ class piface2 extends eqLogic {
       $port = config::byKey('PifacePort', 'piface2');
       $cmd = "/usr/bin/python ".$piface2_path." ".$port;
       log::add('piface2', 'info', 'verify if running  '.$piface2_path);
-      exec("pgrep --full --exact '$cmd'", $pids);
+      exec("pgrep --full 'piface-web.py'", $pids);
       foreach ($pids as $pid)
       {
         log::add('piface2', 'info', 'stopDeamon using kill -9 '  . $pid);
