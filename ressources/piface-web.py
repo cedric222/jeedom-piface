@@ -3,6 +3,10 @@
 version = "1.0"
 exit = 1
 
+jeedom_master_ip = '192.168.0.15'
+jeedom_master_key = 'ii30r4s2jak2hv94t06s'
+jeedom_need_update = 0
+
 
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import urlparse
@@ -14,28 +18,54 @@ import sys
 import json
 import os
 import sys
+import httplib
 
 
 
 DEFAULT_PORT = 8000
 
+def need_update(num):
+  conn = httplib.HTTPConnection(jeedom_master_ip)
+  conn.request("GET", "/jeedom/core/api/jeeApi.php?apikey="+str(jeedom_master_key)+"&type=piface2&messagetype=update")
+  r1 = conn.getresponse()
+  print r1.status, r1.reason
+  conn.close()
+
+  
+  
 
 def event0(event):
   event_counter[0] = event_counter[0] + 1
+  need_update(0)
+  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event1(event):
   event_counter[1] = event_counter[1] + 1
+  need_update(1)
+  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event2(event):
   event_counter[2] = event_counter[2] + 1
+  need_update(2)
+  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event3(event):
   event_counter[3] = event_counter[3] + 1
+  need_update(3)
+  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event4(event):
   event_counter[4] = event_counter[4] + 1
+  need_update(4)
+  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event5(event):
   event_counter[5] = event_counter[5] + 1
+  need_update(5)
+  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event6(event):
   event_counter[6] = event_counter[6] + 1
+  need_update(6)
+  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 def event7(event):
   event_counter[7] = event_counter[7] + 1
+  need_update(7)
+  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 
 
 class GetHandler(BaseHTTPRequestHandler):
@@ -144,14 +174,14 @@ if __name__ == '__main__':
         event_counter[i] = 0
     p = pifacedigitalio.PiFaceDigital()
     listener = pifacedigitalio.InputEventListener(chip=p)
-    listener.register(0, pifacedigitalio.IODIR_FALLING_EDGE, event0)
-    listener.register(1, pifacedigitalio.IODIR_FALLING_EDGE, event1)
-    listener.register(2, pifacedigitalio.IODIR_FALLING_EDGE, event2)
-    listener.register(3, pifacedigitalio.IODIR_FALLING_EDGE, event3)
-    listener.register(4, pifacedigitalio.IODIR_FALLING_EDGE, event4)
-    listener.register(5, pifacedigitalio.IODIR_FALLING_EDGE, event5)
-    listener.register(6, pifacedigitalio.IODIR_FALLING_EDGE, event6)
-    listener.register(7, pifacedigitalio.IODIR_FALLING_EDGE, event7)
+    listener.register(0, pifacedigitalio.IODIR_BOTH, event0)
+    listener.register(1, pifacedigitalio.IODIR_BOTH, event1)
+    listener.register(2, pifacedigitalio.IODIR_BOTH, event2)
+    listener.register(3, pifacedigitalio.IODIR_BOTH, event3)
+    listener.register(4, pifacedigitalio.IODIR_BOTH, event4)
+    listener.register(5, pifacedigitalio.IODIR_BOTH, event5)
+    listener.register(6, pifacedigitalio.IODIR_BOTH, event6)
+    listener.register(7, pifacedigitalio.IODIR_BOTH, event7)
     listener.activate()
     try:  
         run_while_true()

@@ -226,6 +226,17 @@ class piface2 extends eqLogic {
     self::stopDeamon();
 
   }
+  public static function event() {
+  log::add('piface2', 'debug', 'in event');
+  $messageType = init('messagetype');
+  log::add('piface2', 'debug', 'in event messtype = '.$messageType);
+  self::update_info();
+
+  }
+  public  static function pull($_options) {
+   log::add('piface2', 'debug', 'in pull');
+   }
+
 
   /*
    * Non obligatoire mais permet de modifier l'affichage du widget si vous en avez besoin
