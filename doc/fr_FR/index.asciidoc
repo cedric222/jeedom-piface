@@ -1,27 +1,23 @@
-== Template
+== PiFace
 
 === Description
-Plugin servant de base pour les plugins. Attention lors de l'utilisation à bien remplacer tous les templates par l'id de votre plugin
+Le plugin PiFace permet de piloter une carte PiFace connecté a votre raspberry  et d'afficher sur les informations sur le  Jeedom de votre choix. Pour cela 2 modes sont disponibles, le mode local et le mode réseau.
 
 '''
-=== Création plugin partie 1 : l'arborescence
-include::partie_1.asciidoc[]
+=== Installation
+include::installation.asciidoc[]
 
 '''
-=== Création plugin partie 2 : plugin info
-include::partie_2.asciidoc[]
+=== Configuration
+include::configuration.asciidoc[]
 
 '''
-=== Création plugin partie 3 : dossier desktop
-include::partie_3.asciidoc[]
+=== Les commandes
+include::commandes.asciidoc[]
 
 '''
-=== Création plugin partie 4 : dossier core
-include::partie_4.asciidoc[]
-
-'''
-=== FAQ
-include::faq.asciidoc[]
+=== Les statistiques
+include::statistiques.asciidoc[]
 
 '''
 === Changelog

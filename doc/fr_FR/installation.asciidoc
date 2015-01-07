@@ -1,0 +1,10 @@
+Après avoir activé le plugin vous devez choisir son fonctionnement (Mode) :
+
+1 - Local : La carte PiFace est connecté au raspberry maitre de jeedom.
+2 - Carte déporté sur un autre Jeedom : Votre carte Piface est connecté sur une autre installation Jeedom (Excentré dans un tableau électrique par exemple)
+3 - Pousser les données sur un Jeedom central : Vous êtes sur un Jeedom déporté et souhaitez envoyer les informations de la carte PiFace vers le Jeedom master (Exemple : La raspberry dans le tableau électrique).
+
+
+Enfin pensez à sauvegarder.
+
+Un nouveau Protocole est disponible dans Plugins => Protocole domotique => PiFace
