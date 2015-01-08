@@ -2,5 +2,5 @@ Afin d'obtenir des informations sur une durée plus longue des statistiques ont 
 
 Ces statistiques correspondent aux informations suivantes :
 
-- ************
+- Module de type compteur pour suivis
 
