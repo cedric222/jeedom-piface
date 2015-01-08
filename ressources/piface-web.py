@@ -27,58 +27,22 @@ DEFAULT_PORT = 8000
 
 def need_update(num,timestamp):
   global last_update
+  #Pousse la nouvelle valeur vers jeedom en fonction de la duree entre deux updates
   if (timestamp - last_update >= time_between_update and jeedom_master_ip != ''):
-    last_update = timestamp
-    conn = httplib.HTTPConnection(jeedom_master_ip)
-    conn.request("GET", "/jeedom/core/api/jeeApi.php?apikey="+str(jeedom_master_key)+"&type=piface2&messagetype=update")
-    r1 = conn.getresponse()
-    #print r1.status, r1.reason
-    conn.close()
+	last_update = timestamp
+	conn = httplib.HTTPConnection(jeedom_master_ip)
+	conn.request("GET", "/jeedom/core/api/jeeApi.php?apikey="+str(jeedom_master_key)+"&type=piface2&messagetype=update")
+        r1 = conn.getresponse()
+	#print r1.status, r1.reason
+	conn.close()
   else:
-    print "too early "
-
+  	print "too early "
   
-  
-
-def event0(event):
+def Impulsion(event):
   if event.direction == 0:
-      event_counter[0] += 1
-  need_update(0,event.timestamp)
-  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
-def event1(event):
-  if event.direction == 0:
-      event_counter[1] += 1 
-  need_update(1,event.timestamp)
-  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
-def event2(event):
-  if event.direction == 0:
-      event_counter[2] += 1
-  need_update(2,event.timestamp)
-  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
-def event3(event):
-  if event.direction == 0:
-      event_counter[3] += 1
-  need_update(3,event.timestamp)
-  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
-def event4(event):
-  if event.direction == 0:
-      event_counter[4] += 1
-  need_update(4,event.timestamp)
-  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
-def event5(event):
-  if event.direction == 0:
-      event_counter[5] += 1
-  need_update(5,event.timestamp)
-  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
-def event6(event):
-  if event.direction == 0:
-      event_counter[6] += 1
-  need_update(6,event.timestamp)
-  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
-def event7(event):
-  if event.direction == 0:
-      event_counter[7] += 1
-  need_update(7,event.timestamp)
+      event_counter[event.pin_num] += 1
+      need_update(event.pin_num,event.timestamp)
+  print event_counter[event.pin_num]
   print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 
 
@@ -172,6 +136,7 @@ def run_while_true():
     is tested initially and after each request.  If its return value
     is true, the server continues.
     """
+    #Test si un port specifique est passe en parametre de lancement
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     else:
@@ -184,6 +149,7 @@ def run_while_true():
 
 
 if __name__ == '__main__':
+    #Creation d un pid pour pouvoir killer le daemon proprement
     pid = str(os.getpid())
     pidfile = "/tmp/piface-web.pid"
     if os.path.isfile(pidfile):
@@ -191,19 +157,16 @@ if __name__ == '__main__':
         sys.exit()
     else:
         file(pidfile, 'w').write(pid)
+    #Initialisation du Json pour les EVENT
     event_counter  = {}
     for i in range(0,8):
         event_counter[i] = 0
+    #Initialisation de la carte PiFace
     p = pifacedigitalio.PiFaceDigital()
     listener = pifacedigitalio.InputEventListener(chip=p)
-    listener.register(0, pifacedigitalio.IODIR_BOTH, event0)
-    listener.register(1, pifacedigitalio.IODIR_BOTH, event1)
-    listener.register(2, pifacedigitalio.IODIR_BOTH, event2)
-    listener.register(3, pifacedigitalio.IODIR_BOTH, event3)
-    listener.register(4, pifacedigitalio.IODIR_BOTH, event4)
-    listener.register(5, pifacedigitalio.IODIR_BOTH, event5)
-    listener.register(6, pifacedigitalio.IODIR_BOTH, event6)
-    listener.register(7, pifacedigitalio.IODIR_BOTH, event7)
+    #Boucle pour declarer toutes les inputs en interuption
+    for i in range(0,8):
+	    listener.register(i, pifacedigitalio.IODIR_BOTH, Impulsion)
     listener.activate()
     try:  
         run_while_true()
