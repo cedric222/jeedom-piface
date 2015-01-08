@@ -7,7 +7,7 @@ jeedom_master_ip = ''
 jeedom_master_key = ''
 time_between_update = 10
 last_update = 0
-type_update = ''
+
 
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import urlparse
@@ -25,7 +25,7 @@ import httplib
 
 DEFAULT_PORT = 8000
 
-def need_update(num,timestamp,type_update='std'):
+def need_update(num,timestamp):
   global last_update
   #Pousse la nouvelle valeur vers jeedom en fonction de la duree entre deux updates
   if (timestamp - last_update >= time_between_update and jeedom_master_ip != ''):
