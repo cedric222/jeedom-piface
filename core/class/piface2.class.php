@@ -74,7 +74,7 @@ class piface2 extends eqLogic {
       log::add('piface2', 'info', 'IP externe :' . config::byKey('internalAddr'));
       if ($eqLogic->getIsEnable() == 1) {
         $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status?apikey='.config::byKey('api').'&jeedom_master_ip='.config::byKey('internalAddr'));
-        if ($result["VERSION"] == "1.1")
+        if ($result["VERSION"] == "1.2")
         {
           log::add('piface2', 'debug', 'good deamon version '.$result["VERSION"]);
         }

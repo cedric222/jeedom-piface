@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-version = "1.1"
+version = "1.2"
 exit = 1
 
 jeedom_master_ip = ''
@@ -26,9 +26,12 @@ import httplib
 DEFAULT_PORT = 8000
 
 def need_update(num,timestamp):
+  # fonction qui envoi une demande d'update au serveur
   global last_update
-  #Pousse la nouvelle valeur vers jeedom en fonction de la duree entre deux updates
-  if (timestamp - last_update >= time_between_update and jeedom_master_ip != ''):
+  
+  if jeedom_master_ip == '' :
+       print "No server registred"
+  elif (timestamp - last_update >= time_between_update):
 	last_update = timestamp
 	conn = httplib.HTTPConnection(jeedom_master_ip)
 	conn.request("GET", "/jeedom/core/api/jeeApi.php?apikey="+str(jeedom_master_key)+"&type=piface2&messagetype=update")
@@ -36,26 +39,26 @@ def need_update(num,timestamp):
 	#print r1.status, r1.reason
 	conn.close()
   else:
-  	print "too early "
+  	print "too early, waiting"
   
-def Impulsion(event):
+def Interrupt_Impulsion(event):
+  # fonction appelee en cas d'event
+  global event_counter
   if event.direction == 0:
       event_counter[event.pin_num] += 1
       need_update(event.pin_num,event.timestamp)
-  print event_counter[event.pin_num]
-  print "event.pin = "+str(event.pin_num)+"interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
+  print "event_counter = "+ str(event_counter[event.pin_num]) + " event.pin = "+str(event.pin_num)+" interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
 
 
 class GetHandler(BaseHTTPRequestHandler):
-    
+    #class pour le serveur web
     def do_GET(self):
         global jeedom_master_ip
         global jeedom_master_key 
-
-        
         parsed_path = urlparse.urlparse(self.path)
         query_components = parse_qs(parsed_path.query)
         if 'output_set' in query_components:
+              # changement d'été d'un output
               digital_write = query_components['output_set'][0]
               value = query_components['value'][0]
               self.send_response(200)
@@ -65,6 +68,7 @@ class GetHandler(BaseHTTPRequestHandler):
               p.output_pins[int(digital_write)].value = int(value)
               self.wfile.write('{"STATUS":"OK"}')
         elif 'status' in parsed_path.path:
+              #demande de status
               if 'apikey' in  query_components:
                   jeedom_master_key =  query_components['apikey'][0]
               if 'jeedom_master_ip' in  query_components:
@@ -86,6 +90,7 @@ class GetHandler(BaseHTTPRequestHandler):
               json_sting = json.dumps(prepare_json)
               self.wfile.write(json_sting)
         elif 'version' in  parsed_path.path:
+              #demande de version 
               prepare_json = {}
               prepare_json["VERSION"] = version
               json_sting = json.dumps(prepare_json)
@@ -94,6 +99,7 @@ class GetHandler(BaseHTTPRequestHandler):
               self.end_headers()
               self.wfile.write(json_sting)
         elif 'exit' in  parsed_path.path:
+              # todo a soft kill
               global exit
               exit = 0
               prepare_json = {}
@@ -104,6 +110,7 @@ class GetHandler(BaseHTTPRequestHandler):
               self.end_headers()
               self.wfile.write(json_sting)
         else:
+            # for debug
             message_parts = [
                 'CLIENT VALUES:',
                 'client_address=%s (%s)' % (self.client_address,
@@ -166,7 +173,7 @@ if __name__ == '__main__':
     listener = pifacedigitalio.InputEventListener(chip=p)
     #Boucle pour declarer toutes les inputs en interuption
     for i in range(0,8):
-	    listener.register(i, pifacedigitalio.IODIR_BOTH, Impulsion)
+	    listener.register(i, pifacedigitalio.IODIR_BOTH, Interrupt_Impulsion)
     listener.activate()
     try:  
         run_while_true()
