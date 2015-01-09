@@ -58,7 +58,7 @@ class GetHandler(BaseHTTPRequestHandler):
         parsed_path = urlparse.urlparse(self.path)
         query_components = parse_qs(parsed_path.query)
         if 'output_set' in query_components:
-              # changement d'été d'un output
+              # changement d etat d un output
               digital_write = query_components['output_set'][0]
               value = query_components['value'][0]
               self.send_response(200)
