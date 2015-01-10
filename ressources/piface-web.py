@@ -47,7 +47,7 @@ def Interrupt_Impulsion(event):
   if event.direction == 0:
       event_counter[event.pin_num] += 1
       need_update(event.pin_num,event.timestamp)
-  print "event_counter = "+ str(event_counter[event.pin_num]) + " event.pin = "+str(event.pin_num)+" interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp)
+  syslog.syslog("event_counter = "+ str(event_counter[event.pin_num]) + " event.pin = "+str(event.pin_num)+" interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp))
 
 
 class GetHandler(BaseHTTPRequestHandler):
