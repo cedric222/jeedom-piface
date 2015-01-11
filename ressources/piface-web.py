@@ -35,10 +35,10 @@ DEFAULT_PORT = 8000
 def need_update(num,timestamp):
   # fonction qui envoi une demande d'update au serveur
   global last_update
-  
   if jeedom_master_ip == '' :
        log ("No server registred")
   elif (timestamp - last_update >= time_between_update):
+        log ("Try to connect to : "+jeedom_master_ip)
 	last_update = timestamp
 	conn = httplib.HTTPConnection(jeedom_master_ip)
 	conn.request("GET", "/jeedom/core/api/jeeApi.php?apikey="+str(jeedom_master_key)+"&type=piface2&messagetype=update")
