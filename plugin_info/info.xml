@@ -9,7 +9,7 @@
     <installation>Installed piface http://www.piface.org.uk/guides/Install_PiFace_Software/ 
     need to authorise www-data to spi and gpio in /etc/group (doc needed)</installation>
     <require>1.152</require>
-    <version>0.4</version>
+    <version>0.4.1</version>
     <category>automation protocol</category>
     <allowRemote>1</allowRemote>
 </info>
