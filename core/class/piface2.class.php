@@ -71,8 +71,6 @@ class piface2 extends eqLogic {
   public static function update_info()
   {
     foreach (eqLogic::byType('piface2') as $eqLogic) {
-      log::add('piface2', 'info', 'IP externe :' . config::byKey('internalAddr'));
-      if ($eqLogic->getIsEnable() == 1) {
         $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status?apikey='.config::byKey('api').'&jeedom_master_ip='.config::byKey('internalAddr'));
         if ($result["VERSION"] == "1.2")
         {
@@ -85,14 +83,21 @@ class piface2 extends eqLogic {
           self::runDeamon();
           return;
         }
+      log::add('piface2', 'info', 'IP externe :' . config::byKey('internalAddr'));
+      if ($eqLogic->getIsEnable() == 1) {
         foreach ($eqLogic->getCmd() as $cmd) {
-          log::add('piface2', 'debug', 'in for instanceId = '.   $cmd->getConfiguration('instanceId').' type = '.$cmd->getConfiguration('interface') );
+          log::add('piface2', 'debug', 'in for instanceId = '.   $cmd->getConfiguration('instanceId').' type = '. strtoupper( $cmd->getConfiguration('interface')) );
           $piface_type = strtoupper( $cmd->getConfiguration('interface'));
           if ( $cmd->getType() == 'info' and 
               (  $piface_type == 'INPUT' or $piface_type == 'OUTPUT' or $piface_type == 'EVENTS_COUNTER'))
           {
-            $cmd->event($result[$piface_type][$cmd->getConfiguration('instanceId')]);
-            log::add('piface2', 'debug', 'set = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
+             $value = $result[$piface_type][$cmd->getConfiguration('instanceId')] ; //$cmd->execute();
+             log::add('piface2', 'debug', 'execCmd = '.$cmd->execCmd());
+             if ($value != $cmd->execCmd()) {
+                    //$cmd->setCollectDate(' ');
+                    log::add('piface2', 'debug', 'set = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
+                    $cmd->event($value);
+                    }
           }
         }
       }
