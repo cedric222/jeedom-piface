@@ -96,6 +96,7 @@ class piface2 extends eqLogic {
              if ($value != $cmd->execCmd()) {
                     //$cmd->setCollectDate(' ');
                     log::add('piface2', 'debug', 'set = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
+                    $cmd->setCollectDate('');
                     $cmd->event($value);
                     }
           }
