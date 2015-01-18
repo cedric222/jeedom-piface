@@ -85,6 +85,7 @@ class GetHandler(BaseHTTPRequestHandler):
               for i in range(0,8):
                   prepare_json_hash_in[i] = p.input_pins[i].value
                   prepare_json_hash_out[i] = p.output_pins[i].value
+              #prepare_json_hash_in[3] = 1
               self.send_response(200)
               self.send_header("Content-type", "application/json")
               self.end_headers()

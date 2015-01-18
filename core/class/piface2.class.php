@@ -70,19 +70,25 @@ class piface2 extends eqLogic {
 
   public static function update_info()
   {
+    $result = '';
+    $last_serv = '';
     foreach (eqLogic::byType('piface2') as $eqLogic) {
-        $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status?apikey='.config::byKey('api').'&jeedom_master_ip='.config::byKey('internalAddr'));
-        if ($result["VERSION"] == "1.2")
-        {
-          log::add('piface2', 'debug', 'good deamon version '.$result["VERSION"]);
-        }
-        else
-        {
-          log::add('piface2', 'error', 'BAD DEAMON VERSION : '.$result["VERSION"]);
-          self::soft_kill($eqLogic);
-          self::runDeamon();
-          return;
-        }
+        if ($result == '' or $last_serv != $eqLogic->getConfiguration('ippiface')."_".$eqLogic->getConfiguration('portpiface'))
+	{
+        	$result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status?apikey='.config::byKey('api').'&jeedom_master_ip='.config::byKey('internalAddr'));
+        	if ($result["VERSION"] == "1.2")
+        	{	
+          		log::add('piface2', 'debug', 'good deamon version '.$result["VERSION"]);
+        	}
+        	else
+        	{
+	          log::add('piface2', 'error', 'BAD DEAMON VERSION : '.$result["VERSION"]);
+	          self::soft_kill($eqLogic);
+	          self::runDeamon();
+	          return;
+	        }
+	$last_serv = $eqLogic->getConfiguration('ippiface')."_".$eqLogic->getConfiguration('portpiface');
+      }
       log::add('piface2', 'info', 'IP externe :' . config::byKey('internalAddr'));
       if ($eqLogic->getIsEnable() == 1) {
         foreach ($eqLogic->getCmd() as $cmd) {
@@ -92,7 +98,7 @@ class piface2 extends eqLogic {
               (  $piface_type == 'INPUT' or $piface_type == 'OUTPUT' or $piface_type == 'EVENTS_COUNTER'))
           {
              $value = $result[$piface_type][$cmd->getConfiguration('instanceId')] ; //$cmd->execute();
-             log::add('piface2', 'debug', 'execCmd = '.$cmd->execCmd());
+             log::add('piface2', 'debug', 'execCmd(previous) = '.$cmd->execCmd()."current value = ".$value );
              if ($value != $cmd->execCmd()) {
                     //$cmd->setCollectDate(' ');
                     log::add('piface2', 'debug', 'set = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
