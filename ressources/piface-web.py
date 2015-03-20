@@ -1,7 +1,8 @@
 #! /usr/bin/python
 
-version = "1.2"
+version = "1.3"
 exit = 1
+debug = 0
 
 jeedom_master_ip = ''
 jeedom_master_key = ''
@@ -26,8 +27,11 @@ from datetime import datetime
 pyfolder = os.path.dirname(os.path.realpath(__file__)) + "/"
 LOG_FILENAME = pyfolder + '../../../log/piface2_daemon'
 
-def log(message):
-    print(str(strftime("%Y-%m-%d %H:%M:%S", localtime())) + " | debug | ") + str(message)
+def log(level,message):
+    if level != 'debug':
+      print(str(strftime("%Y-%m-%d %H:%M:%S", localtime())) + " | "+str(level)+" | ") + str(message)
+    elif debug:
+      print(str(strftime("%Y-%m-%d %H:%M:%S", localtime())) + " | debug | ") + str(message)
 
 
 DEFAULT_PORT = 8000
@@ -36,17 +40,16 @@ def need_update(num,timestamp):
   # fonction qui envoi une demande d'update au serveur
   global last_update
   if jeedom_master_ip == '' :
-       log ("No server registred")
+       log ('debug', "No server registred")
   elif (timestamp - last_update >= time_between_update):
-        log ("Try to connect to : "+jeedom_master_ip)
+        log ('debug',"Try to connect to : "+jeedom_master_ip)
 	last_update = timestamp
 	conn = httplib.HTTPConnection(jeedom_master_ip)
 	conn.request("GET", "/jeedom/core/api/jeeApi.php?apikey="+str(jeedom_master_key)+"&type=piface2&messagetype=update")
         r1 = conn.getresponse()
-	#print r1.status, r1.reason
 	conn.close()
   else:
-  	log ("too early, waiting")
+  	log ('debug',"too early, waiting")
   
 def Interrupt_Impulsion(event):
   # fonction appelee en cas d'event
@@ -54,7 +57,7 @@ def Interrupt_Impulsion(event):
   if event.direction == 0:
       event_counter[event.pin_num] += 1
       need_update(event.pin_num,event.timestamp)
-  log("event_counter = "+ str(event_counter[event.pin_num]) + " event.pin = "+str(event.pin_num)+" interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp))
+  log('debug',"event_counter = "+ str(event_counter[event.pin_num]) + " event.pin = "+str(event.pin_num)+" interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp))
 
 
 class GetHandler(BaseHTTPRequestHandler):
@@ -71,7 +74,7 @@ class GetHandler(BaseHTTPRequestHandler):
               self.send_response(200)
               self.send_header("Content-type", "application/json")
               self.end_headers()
-              log("doing piface digital_write "+str(digital_write)+" "+str(value))
+              log('debug',"doing piface digital_write "+str(digital_write)+" "+str(value))
               p.output_pins[int(digital_write)].value = int(value)
               self.wfile.write('{"STATUS":"OK"}')
         elif 'status' in parsed_path.path:
@@ -165,14 +168,14 @@ def run_while_true():
 
 if __name__ == '__main__':
     #Creation d un pid pour pouvoir killer le daemon proprement
-    log ("start piface2 Deamon")
     pid = str(os.getpid())
     pidfile = "/tmp/piface-web.pid"
     sys.stdout = open(LOG_FILENAME, 'a', 1)
-    sys.stderr = open(LOG_FILENAME, 'a', 1)
-
+    if debug:
+        sys.stderr = open(LOG_FILENAME, 'a', 1)
+    log('info',"start piface2 Deamon")
     if os.path.isfile(pidfile):
-        log ( pidfile + " already exists, exiting" )
+        log ( 'info',pidfile + " already exists, exiting" )
         sys.exit()
     else:
         file(pidfile, 'w').write(pid)
@@ -190,9 +193,9 @@ if __name__ == '__main__':
     try:  
         run_while_true()
     except:
-        log ("end in except")
+        log ('info',"end in except")
     #Kill
     listener.deactivate()
     os.unlink(pidfile)
-    log ("Bye.")
+    log ('info',"Bye.")
 

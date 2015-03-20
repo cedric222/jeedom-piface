@@ -23,7 +23,6 @@ require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 class piface2 extends eqLogic {
   public static function callpiface2web($ip,$port,$_url) {
     $url = 'http://' . $ip.':' .$port . $_url;
-    log::add('piface2', 'Debug', 'url call =  '.$url);
     $ch = curl_init();
     curl_setopt_array($ch, array(
           CURLOPT_URL => $url,
@@ -57,7 +56,6 @@ class piface2 extends eqLogic {
   //Fonction lancé automatiquement toutes les minutes par jeedom
   public static function cron() {
     $mode = config::byKey('Mode', 'piface2');
-    log::add('piface2', 'Debug', 'In cron in Mode =  '.$mode);
     if (!self::deamonRunning()) {
       self::runDeamon();
     }
@@ -76,7 +74,7 @@ class piface2 extends eqLogic {
         if ($result == '' or $last_serv != $eqLogic->getConfiguration('ippiface')."_".$eqLogic->getConfiguration('portpiface'))
 	{
         	$result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status?apikey='.config::byKey('api').'&jeedom_master_ip='.config::byKey('internalAddr'));
-        	if ($result["VERSION"] == "1.2")
+        	if ($result["VERSION"] == "1.3")
         	{	
           		log::add('piface2', 'debug', 'good deamon version '.$result["VERSION"]);
         	}
@@ -89,16 +87,14 @@ class piface2 extends eqLogic {
 	        }
 	$last_serv = $eqLogic->getConfiguration('ippiface')."_".$eqLogic->getConfiguration('portpiface');
       }
-      log::add('piface2', 'info', 'IP externe :' . config::byKey('internalAddr'));
+      log::add('piface2', 'debug', 'IP externe :' . config::byKey('internalAddr'));
       if ($eqLogic->getIsEnable() == 1) {
         foreach ($eqLogic->getCmd() as $cmd) {
-          log::add('piface2', 'debug', 'in for instanceId = '.   $cmd->getConfiguration('instanceId').' type = '. strtoupper( $cmd->getConfiguration('interface')) );
           $piface_type = strtoupper( $cmd->getConfiguration('interface'));
           if ( $cmd->getType() == 'info' and 
               (  $piface_type == 'INPUT' or $piface_type == 'OUTPUT' or $piface_type == 'EVENTS_COUNTER'))
           {
              $value = $result[$piface_type][$cmd->getConfiguration('instanceId')] ; //$cmd->execute();
-             log::add('piface2', 'debug', 'execCmd(previous) = '.$cmd->execCmd()."current value = ".$value );
              if ($value != $cmd->execCmd()) {
                     //$cmd->setCollectDate(' ');
                     log::add('piface2', 'debug', 'set = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
@@ -170,7 +166,7 @@ class piface2 extends eqLogic {
       $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
       $port = config::byKey('PifacePort', 'piface2');
       $cmd = "/usr/bin/python ".$piface2_path." ".$port;
-      log::add('piface2', 'info', 'verify if running  '.$piface2_path);
+      log::add('piface2', 'debug', 'verify if running  '.$piface2_path);
       exec("pgrep --full 'piface-web.py'", $pids);
       foreach ($pids as $pid)
       {
@@ -240,7 +236,6 @@ class piface2 extends eqLogic {
 
   }
   public static function event() {
-  log::add('piface2', 'debug', 'in event');
   $messageType = init('messagetype');
   log::add('piface2', 'debug', 'in event messtype = '.$messageType);
   self::update_info();

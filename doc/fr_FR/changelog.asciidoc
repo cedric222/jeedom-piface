@@ -1,20 +1,3 @@
-Version 0.3.3 some optimizations (thanks farfadet)
+change log in https://github.com/cedric222/jeedom-piface
 
-Version 0.3.1 emergency fix...
-
-Version 0.3 mise a jour plus rapide (push)
-
-Version 0.2 Gestion des versions du client Python
-
-Version 0.1.1 le plugin se relance à l'upgrade
-
-Version 0.1  le conteur d'impulsion fonctionne (première version utilisable)
-
-Version 0.0.5  Bug fix + interface modifiée 
-
-Version 0.0.4  Bug fix
-
-Version 0.0.3  Try to update status
-
-Version 0.0.2  use a python web server
 
