@@ -61,6 +61,7 @@ class piface2 extends eqLogic {
     }
     if ($mode != "esclave")
     {
+      log::add('piface2', 'debug', 'Start Update Info from cron');
       self::update_info();
     }
   }
@@ -70,6 +71,7 @@ class piface2 extends eqLogic {
   {
     $result = '';
     $last_serv = '';
+    log::add('piface2', 'debug', 'Start Update Info');
     foreach (eqLogic::byType('piface2') as $eqLogic) {
       if ($result == '' or $last_serv != $eqLogic->getConfiguration('ippiface')."_".$eqLogic->getConfiguration('portpiface'))
       {
@@ -87,19 +89,22 @@ class piface2 extends eqLogic {
         }
         $last_serv = $eqLogic->getConfiguration('ippiface')."_".$eqLogic->getConfiguration('portpiface');
       }
-      log::add('piface2', 'debug', 'IP externe :' . config::byKey('internalAddr'));
       if ($eqLogic->getIsEnable() == 1) {
         foreach ($eqLogic->getCmd() as $cmd) {
           $piface_type = strtoupper( $cmd->getConfiguration('interface'));
           if ( $cmd->getType() == 'info' and 
               (  $piface_type == 'INPUT' or $piface_type == 'OUTPUT' or $piface_type == 'EVENTS_COUNTER'))
           {
-            $value = $result[$piface_type][$cmd->getConfiguration('instanceId')] ; //$cmd->execute();
+#$cmd->setEventOnly(1);
+            $value = $result[$piface_type][$cmd->getConfiguration('instanceId')] ;
             if ($value != $cmd->execCmd()) {
-              //$cmd->setCollectDate(' ');
-              log::add('piface2', 'debug', 'set = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
+              log::add('piface2', 'debug', 'set '.$piface_type.' instanceID '.$cmd->getConfiguration('instanceId').' =  '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
               $cmd->setCollectDate('');
               $cmd->event($value);
+            }
+            else
+            {
+              log::add('piface2', 'debug', 'dont need to change '.$piface_type.' instanceID '.$cmd->getConfiguration('instanceId').' =  '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
             }
           }
         }
@@ -160,8 +165,6 @@ class piface2 extends eqLogic {
     if (!self::deamonRunning()) {
       return true;
     }
-#self::soft_kill();
-#sleep(5);
     if (self::deamonRunning()) {
       $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
       $port = config::byKey('PifacePort', 'piface2');
@@ -208,8 +211,7 @@ class piface2 extends eqLogic {
   }
 
   public function preSave() {
-    log::add('piface2', 'debug', 'in preSave');
-
+    log::add('piface2', 'debug', 'in preSave v1');
   }
 
   public function postSave() {
@@ -257,6 +259,10 @@ class piface2 extends eqLogic {
 }
 
 class piface2Cmd extends cmd {
+  public function preSave() {
+    log::add('piface2', 'debug', 'in preSave V2');
+    $this->setEventOnly(1);
+  }
   /*     * *************************Attributs****************************** */
 
 
@@ -273,18 +279,18 @@ class piface2Cmd extends cmd {
    */
 
   public function execute($_options = array()) {
-    log::add('piface2', 'debug', 'Début fonction d\'envoi commandes piface2');
     $eqLogic = $this->getEqLogic();
-    log::add('piface2', 'debug', 'in execute with instanceId = '.   $this->getConfiguration('instanceId').  'and value = '.   $this->getConfiguration('value') );
+    log::add('piface2', 'debug', 'in execute with action = '.$this->getType().', instanceId = '.   $this->getConfiguration('instanceId').  ',value = '.   $this->getConfiguration('value') );
     if ($this->getType() == 'action') {
       $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , 
           $eqLogic->getConfiguration('portpiface'), 
           '/?output_set='.$this->getConfiguration('instanceId').'&value='. $this->getConfiguration('value'));
       //TODO mettre a jour les infos
+      log::add('piface2', 'debug', 'Start Update Info from execute');
       piface2::update_info();
     }
     else {
-      log::add('piface2', 'debug', 'in execute with type '.   $this->getType() );
+      log::add('piface2', 'info', 'NOT NORMAL in execute with type '.   $this->getType() );
       //TODO gerer quand c'est pas de type evenement
     }
 
