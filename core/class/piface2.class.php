@@ -71,21 +71,21 @@ class piface2 extends eqLogic {
     $result = '';
     $last_serv = '';
     foreach (eqLogic::byType('piface2') as $eqLogic) {
-        if ($result == '' or $last_serv != $eqLogic->getConfiguration('ippiface')."_".$eqLogic->getConfiguration('portpiface'))
-	{
-        	$result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status?apikey='.config::byKey('api').'&jeedom_master_ip='.config::byKey('internalAddr'));
-        	if ($result["VERSION"] == "1.3")
-        	{	
-          		log::add('piface2', 'debug', 'good deamon version '.$result["VERSION"]);
-        	}
-        	else
-        	{
-	          log::add('piface2', 'error', 'BAD DEAMON VERSION : '.$result["VERSION"]);
-	          self::soft_kill($eqLogic);
-	          self::runDeamon();
-	          return;
-	        }
-	$last_serv = $eqLogic->getConfiguration('ippiface')."_".$eqLogic->getConfiguration('portpiface');
+      if ($result == '' or $last_serv != $eqLogic->getConfiguration('ippiface')."_".$eqLogic->getConfiguration('portpiface'))
+      {
+        $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status?apikey='.config::byKey('api').'&jeedom_master_ip='.config::byKey('internalAddr'));
+        if ($result["VERSION"] == "1.3")
+        {	
+          log::add('piface2', 'debug', 'good deamon version '.$result["VERSION"]);
+        }
+        else
+        {
+          log::add('piface2', 'error', 'BAD DEAMON VERSION : '.$result["VERSION"]);
+          self::soft_kill($eqLogic);
+          self::runDeamon();
+          return;
+        }
+        $last_serv = $eqLogic->getConfiguration('ippiface')."_".$eqLogic->getConfiguration('portpiface');
       }
       log::add('piface2', 'debug', 'IP externe :' . config::byKey('internalAddr'));
       if ($eqLogic->getIsEnable() == 1) {
@@ -94,13 +94,13 @@ class piface2 extends eqLogic {
           if ( $cmd->getType() == 'info' and 
               (  $piface_type == 'INPUT' or $piface_type == 'OUTPUT' or $piface_type == 'EVENTS_COUNTER'))
           {
-             $value = $result[$piface_type][$cmd->getConfiguration('instanceId')] ; //$cmd->execute();
-             if ($value != $cmd->execCmd()) {
-                    //$cmd->setCollectDate(' ');
-                    log::add('piface2', 'debug', 'set = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
-                    $cmd->setCollectDate('');
-                    $cmd->event($value);
-                    }
+            $value = $result[$piface_type][$cmd->getConfiguration('instanceId')] ; //$cmd->execute();
+            if ($value != $cmd->execCmd()) {
+              //$cmd->setCollectDate(' ');
+              log::add('piface2', 'debug', 'set = '.   $result[$piface_type][$cmd->getConfiguration('instanceId')] );
+              $cmd->setCollectDate('');
+              $cmd->event($value);
+            }
           }
         }
       }
@@ -236,14 +236,14 @@ class piface2 extends eqLogic {
 
   }
   public static function event() {
-  $messageType = init('messagetype');
-  log::add('piface2', 'debug', 'in event messtype = '.$messageType);
-  self::update_info();
+    $messageType = init('messagetype');
+    log::add('piface2', 'debug', 'in event messtype = '.$messageType);
+    self::update_info();
 
   }
   public  static function pull($_options) {
-   log::add('piface2', 'debug', 'in pull');
-   }
+    log::add('piface2', 'debug', 'in pull');
+  }
 
 
   /*
