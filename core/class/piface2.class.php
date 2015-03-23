@@ -168,7 +168,7 @@ class piface2 extends eqLogic {
     if (self::deamonRunning()) {
       $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
       $port = config::byKey('PifacePort', 'piface2');
-      $cmd = "/usr/bin/python ".$piface2_path." ".$port;
+      $cmd = "nice -19 /usr/bin/python ".$piface2_path." ".$port;
       log::add('piface2', 'debug', 'verify if running  '.$piface2_path);
       exec("pgrep --full 'piface-web.py'", $pids);
       foreach ($pids as $pid)
