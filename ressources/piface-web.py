@@ -6,7 +6,7 @@ debug = 0
 
 jeedom_master_ip = ''
 jeedom_master_key = ''
-time_between_update = 10
+time_between_update = 1
 last_update = 0
 
 
@@ -180,6 +180,7 @@ if __name__ == '__main__':
     else:
         file(pidfile, 'w').write(pid)
     #Initialisation du Json pour les EVENT
+     
     event_counter  = {}
     for i in range(0,8):
         event_counter[i] = 0
