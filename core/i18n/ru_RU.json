@@ -4,6 +4,6 @@
         "Installed piface http://www.piface.org.uk/guides/Install_PiFace_Software/ \n    need to authorise www-data to spi and gpio in /etc/group (doc needed)": "Installed piface http://www.piface.org.uk/guides/Install_PiFace_Software/ \n    need to authorise www-data to spi and gpio in /etc/group (doc needed)"
     },
     "plugins/piface2/core/class/piface2.class.php": {
-        "Echec de la requete http : ": "Echec de la requete http :"
+        "Echec de la requete http : ": "Не удалось запросить HTTP:"
     }
 }

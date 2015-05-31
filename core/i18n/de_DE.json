@@ -1,0 +1,9 @@
+{
+    "plugins/piface2/plugin_info/info.xml": {
+        "Piface2": "Piface2",
+        "Installed piface http://www.piface.org.uk/guides/Install_PiFace_Software/ \n    need to authorise www-data to spi and gpio in /etc/group (doc needed)": "Piface Installieren http://www.piface.org.uk/guides/Install_PiFace_Software/ \nNotwendigkeit, www-Daten in spi und gpio zu autorisieren  /etc/group (doc erforderlich)"
+    },
+    "plugins/piface2/core/class/piface2.class.php": {
+        "Echec de la requete http : ": "Fehler bei der http abfrage:"
+    }
+}
