@@ -49,14 +49,14 @@ $eqLogics = eqLogic::byType('piface2');
             <fieldset>
                 <legend><i class="fa fa-arrow-circle-left eqLogicAction cursor" data-action="returnToThumbnailDisplay"></i> {{Général}}  <i class='fa fa-cogs eqLogicAction pull-right cursor expertModeVisible' data-action='configure'></i></legend>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label">{{Nom de l'équipement template}}</label>
+                    <label class="col-sm-2 control-label">{{Nom de l'équipement template}}</label>
                     <div class="col-sm-3">
                         <input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;" />
                         <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement template}}"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label" >{{Objet parent}}</label>
+                    <label class="col-sm-2 control-label" >{{Objet parent}}</label>
                     <div class="col-sm-3">
                         <select id="sel_object" class="eqLogicAttr form-control" data-l1key="object_id">
                             <option value="">{{Aucun}}</option>
@@ -69,24 +69,36 @@ $eqLogics = eqLogic::byType('piface2');
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label" >{{Activer}}</label>
+                    <label class="col-sm-2 control-label">{{Catégorie}}</label>
+                    <div class="col-sm-8">
+                        <?php
+				foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
+			        echo '<label class="checkbox-inline">';
+			        echo '<input type="checkbox" class="eqLogicAttr" data-l1key="category" data-l2key="' . $key . '" />' . $value['name'];
+			        echo '</label>';
+				}
+			?>
+                    </div>
+                </div>
+		<div class="form-group">
+                    <label class="col-sm-2 control-label" >{{Activer}}</label>
                     <div class="col-sm-1">
                         <input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" size="16" checked/>
                     </div>
-                    <label class="col-sm-3 control-label" >{{Visible}}</label>
+                    <label class="col-sm-2 control-label" >{{Visible}}</label>
                     <div class="col-sm-1">
                         <input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label">{{ip server web}}</label>
-                    <div class="col-sm-3">
+                    <label class="col-sm-2 control-label">{{ip server web}}</label>
+                    <div class="col-sm-1">
                         <input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="ippiface" placeholder="IP du server piface"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label">{{port server web}}</label>
-                    <div class="col-sm-3">
+                    <label class="col-sm-2 control-label">{{port server web}}</label>
+                    <div class="col-sm-1">
                         <input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="portpiface" placeholder="port du server piface"/>
                     </div>
                 </div>
@@ -95,7 +107,10 @@ $eqLogics = eqLogic::byType('piface2');
 
 
     <legend>Commandes</legend>
-             <a class="btn btn-success btn-sm cmdAction expertModeVisible" data-action="add"><i class="fa fa-plus-circle"></i> {{Commandes}}</a><br/><br/>
+        <a class="btn btn-success btn-sm cmdAction expertModeVisible" id="Bt_AddSortie"><i class="fa fa-plus-circle"></i> {{Ajouter une sortie}}</a>
+	<a class="btn btn-success btn-sm cmdAction expertModeVisible" id="Bt_AddEntree"><i class="fa fa-plus-circle"></i> {{Ajouter une entree}}</a>
+	<a class="btn btn-success btn-sm cmdAction expertModeVisible" id="Bt_AddImpulsion"><i class="fa fa-plus-circle"></i> {{Ajouter une entree d'impulsion}}</a><br/><br/>
+
              <table id="table_cmd" class="table table-bordered table-condensed">
                  <thead>
                      <tr>
