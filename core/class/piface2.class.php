@@ -76,7 +76,7 @@ class piface2 extends eqLogic {
       if ($result == '' or $last_serv != $eqLogic->getConfiguration('ippiface')."_".$eqLogic->getConfiguration('portpiface'))
       {
         $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status?apikey='.config::byKey('api').'&jeedom_master_ip='.config::byKey('internalAddr'));
-        if ($result["VERSION"] == "1.3")
+        if ($result["VERSION"] == "1.4")
         {	
           log::add('piface2', 'debug', 'good deamon version '.$result["VERSION"]);
         }

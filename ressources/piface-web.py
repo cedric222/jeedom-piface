@@ -1,8 +1,8 @@
 #! /usr/bin/python
 
-version = "1.3"
+version = "1.4"
 exit = 1
-debug = 0
+debug = 1
 
 jeedom_master_ip = ''
 jeedom_master_key = ''
@@ -25,7 +25,8 @@ from datetime import datetime
 
 
 pyfolder = os.path.dirname(os.path.realpath(__file__)) + "/"
-LOG_FILENAME = pyfolder + '../../../log/piface2_daemon'
+LOG_FILENAME_ERR = pyfolder + '../../../log/piface2_daemon_err'
+LOG_FILENAME_OUT = pyfolder + '../../../log/piface2_daemon_out'
 
 def log(level,message):
     if level != 'debug':
@@ -39,6 +40,7 @@ DEFAULT_PORT = 8000
 def need_update(num,timestamp):
   # fonction qui envoi une demande d'update au serveur
   global last_update
+  log ('debug',"IN need_update")
   if jeedom_master_ip == '' :
        log ('debug', "No server registred")
   elif (timestamp - last_update >= time_between_update):
@@ -46,6 +48,7 @@ def need_update(num,timestamp):
 	last_update = timestamp
 	conn = httplib.HTTPConnection(jeedom_master_ip)
 	conn.request("GET", "/jeedom/core/api/jeeApi.php?apikey="+str(jeedom_master_key)+"&type=piface2&messagetype=update")
+        log ('debug',"url=/jeedom/core/api/jeeApi.php?apikey="+str(jeedom_master_key)+"&type=piface2&messagetype=update")
         r1 = conn.getresponse()
 	conn.close()
   else:
@@ -56,7 +59,7 @@ def Interrupt_Impulsion(event):
   global event_counter
   if event.direction == 0:
       event_counter[event.pin_num] += 1
-      need_update(event.pin_num,event.timestamp)
+  need_update(event.pin_num,event.timestamp)
   log('debug',"event_counter = "+ str(event_counter[event.pin_num]) + " event.pin = "+str(event.pin_num)+" interrupt_flag="+str(event.interrupt_flag)+" direction="+str(event.direction)+" chip ="+str(event.chip)+" timestamp = "+str(event.timestamp))
 
 
@@ -170,9 +173,9 @@ if __name__ == '__main__':
     #Creation d un pid pour pouvoir killer le daemon proprement
     pid = str(os.getpid())
     pidfile = "/tmp/piface-web.pid"
-    sys.stdout = open(LOG_FILENAME, 'a', 1)
+    sys.stdout = open(LOG_FILENAME_OUT, 'a', 1)
     if debug:
-        sys.stderr = open(LOG_FILENAME, 'a', 1)
+        sys.stderr = open(LOG_FILENAME_ERR, 'a', 1)
     log('info',"start piface2 Deamon")
     if os.path.isfile(pidfile):
         log ( 'info',pidfile + " already exists, exiting" )
