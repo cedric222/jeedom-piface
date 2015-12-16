@@ -76,7 +76,7 @@ class piface2 extends eqLogic {
       if ($result == '' or $last_serv != $eqLogic->getConfiguration('ippiface')."_".$eqLogic->getConfiguration('portpiface'))
       {
         $result = piface2::callpiface2web($eqLogic->getConfiguration('ippiface') , $eqLogic->getConfiguration('portpiface'), '/status?apikey='.config::byKey('api').'&jeedom_master_ip='.config::byKey('internalAddr'));
-        if ($result["VERSION"] == "1.3")
+        if ($result["VERSION"] == "1.4")
         {	
           log::add('piface2', 'debug', 'good deamon version '.$result["VERSION"]);
         }
@@ -128,7 +128,7 @@ class piface2 extends eqLogic {
     {
       $piface2_path = realpath(dirname(__FILE__) . '/../../ressources/').'/piface-web.py';
       $port = config::byKey('PifacePort', 'piface2');
-      $cmd = "/usr/bin/nice -n 19 /usr/bin/python ".$piface2_path." ".$port;
+      $cmd = "/usr/bin/nice -n 19 /usr/bin/python3 ".$piface2_path." ".$port;
       $result = exec($cmd . ' >> ' . log::getPathToLog('piface2') . ' 2>&1 &');
       if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
         log::add('piface2', 'error', $result);
