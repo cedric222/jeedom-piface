@@ -177,6 +177,7 @@ def run_while_true():
 if __name__ == '__main__':
     #Creation d un pid pour pouvoir killer le daemon proprement
     pid = str(os.getpid())
+    pidfile = "/tmp/piface-web.pid"
     sys.stdout = open(LOG_FILENAME_OUT, 'a', 1)
     if debug:
         sys.stderr = open(LOG_FILENAME_ERR, 'a', 1)
